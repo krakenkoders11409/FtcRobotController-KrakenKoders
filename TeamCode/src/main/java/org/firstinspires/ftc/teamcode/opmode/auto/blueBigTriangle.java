@@ -29,23 +29,45 @@ public class blueBigTriangle extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        Robot robot = new Robot(hardwareMap, telemetry);
-
         //telemetry.addData("Status", "Initialized");
-
+        Robot robot = new Robot(hardwareMap, telemetry);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        
+
+        robot.limelight.periodic();
+
+        while(opModeIsActive() && !robot.limelight.hasTarget()) {
+            robot.limelight.periodic();
+            telemetry.addLine("Searching for Tag...");
+            telemetry.update();
+
+            robot.drive.drive(0, 0, 0.15);
+
+        robot.drive.drive(0, 0, 0);
+        telemetry.addLine("Tag Found!");
+        telemetry.update();
+
+        while (opModeIsActive() && robot.limelight.hasTarget() && Math.abs(robot.limelight.getTx()) > 1.0) {
+            robot.limelight.periodic();
+            double turn = robot.limelight.getSteeringCorrections();
+            robot.drive.drive(0, 0, turn);
+
+            telemetry.addData("Tx = ", robot.limelight.getTx());
+            telemetry.addData("Turn", turn);
+            telemetry.update();
+        }
+
+        robot.drive.drive(0, 0, 0);
+
         robot.drive.resetEncoders();
         robot.drive.setRunToPositionMode();
-        robot.drive.setTargetForwardInches(36, .8);
-        sleep(500);
+        robot.drive.setTargetForwardInches(10, 0.8);
+
         robot.shooter.startShot(3, "short");
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()){
+        while(opModeIsActive()) {
             robot.shooter.update();
+        }
         }
     }
 }

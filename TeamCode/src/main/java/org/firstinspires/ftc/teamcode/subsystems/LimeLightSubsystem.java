@@ -61,6 +61,27 @@ public class LimeLightSubsystem {
         }
     }
 
+    public double getSteeringCorrections(){
+        if(!hasTarget) return 0.0;
+
+        double kp = 0.03;
+        double correction = kp * tx;
+        double max = 0.3;
+
+        if(correction > max){
+            correction = max;
+        }
+        if(correction < -max){
+            correction = -max;
+        }
+        return correction;
+    }
+
+
+
+
+
+
     // --- Public API for rest of robot ---
 
     public boolean hasTarget() {

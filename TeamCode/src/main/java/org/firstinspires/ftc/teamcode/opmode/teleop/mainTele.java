@@ -13,7 +13,8 @@ import org.firstinspires.ftc.teamcode.hardware.Robot;
 public class mainTele extends LinearOpMode {
     private Robot robot;
     private boolean isRed = true;
-    
+
+    // Buttons
     boolean APressedLast = false;
     boolean BPressedLast = false;
     boolean XPressedLast = false;
@@ -56,6 +57,7 @@ public class mainTele extends LinearOpMode {
                 // Control the first intake
                 if (gamepad2.left_bumper)  {
                     robot.shooter.startIntake();
+
                 } else {
                     robot.shooter.stopIntake();
                 }
@@ -69,13 +71,21 @@ public class mainTele extends LinearOpMode {
                 }
             }
         
-            if (gamepad2.left_trigger > 0) {
-                robot.shooter.startIntake2();
-            } else {
-                robot.shooter.stopIntake2();
-            }
+//            if (gamepad2.left_trigger > 0) {
+//                robot.shooter.startIntake2();
+//            } else {
+//                robot.shooter.stopIntake2();
+//            }
 
             robot.drive.drive(forward, strafe, turn);
+            robot.drive.update();
+
+
+            robot.limelight.periodic();
+            if (robot.limelight.hasTarget()) {
+                robot.turret.aimAtTx(robot.limelight.getTx());
+            }
+            robot.turret.update();
             
             // Display info on driver station --------------------------------
             robot.addTelemetry(telemetry);

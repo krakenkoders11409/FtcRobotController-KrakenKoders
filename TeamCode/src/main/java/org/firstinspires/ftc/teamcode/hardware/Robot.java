@@ -6,20 +6,22 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 //import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimeLightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterController;
+import org.firstinspires.ftc.teamcode.subsystems.TurretSubsystem;
 
 public class Robot {
 
     public DriveSubsystem drive;
     //public IntakeSubsystem intake;
     public ShooterController shooter;
-
     public LimeLightSubsystem limelight;
+    public TurretSubsystem turret;
 
     public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
         // Initialize all subsystems in a controlled, predictable order
         drive = new DriveSubsystem(hardwareMap);
         shooter = new ShooterController(hardwareMap);
         limelight = new LimeLightSubsystem(hardwareMap);
+        turret = new TurretSubsystem(hardwareMap);
         //intake = new IntakeSubsystem(hardwareMap);
     }
 
@@ -27,6 +29,7 @@ public class Robot {
         drive.addTelemetry(telemetry);
         shooter.addTelemetry(telemetry);
         limelight.addTelemetry(telemetry);
+        turret.addTelemetry(telemetry);
     }
 
     /** Called every control loop — optional, but great practice */
@@ -34,6 +37,7 @@ public class Robot {
         drive.periodic();
         shooter.update();
         limelight.periodic();
+        turret.periodic();
         // Intake may not need periodic update
     }
 }
