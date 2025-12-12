@@ -41,6 +41,11 @@ public class mainTele extends LinearOpMode {
                 robot.drive.toggleSlowMode();
             }
 
+
+            if (gamepad2.x && !XPressedLast) {
+                robot.shooter.liftBall();
+            }
+
             // Initiate a short shot
             if (gamepad2.y && !YPressedLast) {
                     robot.shooter.startShot(1, "short");

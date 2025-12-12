@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -34,6 +36,10 @@ public class ShooterController {
     private final ElapsedTime timer = new ElapsedTime();
     private State state = State.IDLE;
     private boolean busy = false;
+    private boolean toggleState = false;
+    private boolean previousTrigger = false;
+
+
     private int numberOfShots = 0;
     private int numberOfBalls = 0;
     private double lastVelocity = 0;
@@ -172,10 +178,10 @@ public class ShooterController {
         intake.setPower(0);
     }
 
-    public void liftBall(){
-        intakeArmServo.setPosition(0.4);
+    public void liftBall() throws InterruptedException {
         intakeArmServo.setPosition(0.6);
-        intakeArmServo.setPosition(0.4);
+        sleep(10);
+        intakeArmServo.setPosition(0);
     }
 
     public void startLauncher() {
