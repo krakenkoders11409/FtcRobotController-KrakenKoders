@@ -1,29 +1,25 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class TurretSubsystem {
     // Setup for Turret Servo ------------------------------------------------------------
-    private final double turretMax = 0.85;
-    private final double turretMin = 0.15;
-    private double TurretPos = 0;
+    private final int turretMax = 1200;
+    private final int turretMin = 0;
+    private int turretPos = 0;
+    private final DcMotorEx turntableMotor;
+    
     // Setup for Speed for both Turret and Angle -----------------------------------------
-    private final double speed = 0.8;
+    private final double speed = 10;
     
-    
-
-
-
+    // ---------------------------------------------------------------
     public enum State {AUTO, IDLE, MANUAL}
 
-    private final CRServo turntableServo;
     private final int horizontalTolerance = 10;
     private final int verticalTolerance = 10;
 
@@ -39,19 +35,25 @@ public class TurretSubsystem {
 
     private boolean busy = false;
 
-    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        turntableServo = hardwareMap.get(CRServo.class, "turntableServo");
-
+    public TurretSubsystem(HardwareMap hardwareMap) {
+        turntableMotor = hardwareMap.get(DcMotorEx.class, "turntableMotor");
+        
 
         // Set directions (adjust if movement is inverted) ----------
-        turntableServo.setDirection(CRServo.Direction.FORWARD);
+        turntableMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turntableMotor.setTargetPosition(0);
+        turntableMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        turntableMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turntableMotor.setPower(0.6);
 
       }
     // Manual Aiming
     public void manualAiming(double horizontal){
-        double turnPower = horizontal * speed;
-        turntableServo.setPower(turnPower);
+        turretPos += (int)(horizontal * speed);
+        turretPos = Math.max(turretMin, Math.min(turretMax, turretPos));
+        turntableMotor.setTargetPosition(turretPos);
+
     }
     
     // Look For Game Objects
@@ -68,7 +70,7 @@ public class TurretSubsystem {
     public void addTelemetry (Telemetry telemetry){
         telemetry.addLine("----- Turret -----");
         telemetry.addData("Turret State = ", state);
-        telemetry.addData("Turret Horizontal Power = ", turntableServo.getPower());
+        telemetry.addData("Turret position = ", turretPos);
 
 
     }
