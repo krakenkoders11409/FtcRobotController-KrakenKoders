@@ -14,10 +14,6 @@ public class TurretSubsystem {
     private final double turretMax = 0.85;
     private final double turretMin = 0.15;
     private double TurretPos = 0;
-    // Setup for Angling Servos -----------------------------------------------------------
-    private final double angleMax = 1;
-    private final double angleMin = 0;
-    private double anglePos = 0;
     // Setup for Speed for both Turret and Angle -----------------------------------------
     private final double speed = 0.8;
     
@@ -27,7 +23,7 @@ public class TurretSubsystem {
 
     public enum State {AUTO, IDLE, MANUAL}
 
-    private final CRServo turntableServo, leftVerticalServo, rightVerticalServo;
+    private final CRServo turntableServo;
     private final int horizontalTolerance = 10;
     private final int verticalTolerance = 10;
 
@@ -45,25 +41,17 @@ public class TurretSubsystem {
 
     public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         turntableServo = hardwareMap.get(CRServo.class, "turntableServo");
-        leftVerticalServo = hardwareMap.get(CRServo.class, "leftVerticalServo");
-        rightVerticalServo = hardwareMap.get(CRServo.class, "rightVerticalServo");
+
 
         // Set directions (adjust if movement is inverted) ----------
         turntableServo.setDirection(CRServo.Direction.FORWARD);
-        leftVerticalServo.setDirection(CRServo.Direction.REVERSE);
-        rightVerticalServo.setDirection(CRServo.Direction.REVERSE);
+
 
       }
     // Manual Aiming
     public void manualAiming(double horizontal){
         double turnPower = horizontal * speed;
         turntableServo.setPower(turnPower);
-    }
-
-    public void manualAngling( double vertical){
-        double anglePower = vertical * speed;
-        leftVerticalServo.setPower(anglePower);
-        rightVerticalServo.setPower(-anglePower);
     }
     
     // Look For Game Objects
@@ -76,8 +64,6 @@ public class TurretSubsystem {
 
 
         currentHorizontalPosition = turntableServo.getPower();
-        currentVerticalPosition = leftVerticalServo.getPower();
-
 
 //        targetHorizontalPosition = 0;
 //        targetVerticalPosition = 0;

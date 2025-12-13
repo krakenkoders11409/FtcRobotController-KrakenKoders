@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static java.lang.Thread.sleep;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,9 +17,19 @@ import java.util.Objects;
 public class ShooterSubsystem {
     public enum State { IDLE, SPIN_UP, FEED, SPIN_DOWN, EJECT }
 
+    // Setup for Angling Servos -----------------------------------------------------------
+    private final double angleMax = 1;
+    private final double angleMin = 0;
+    private double anglePos = 0;
+    // Setup for Angling Speed
+    private final double angSpeed = 0.8;
+
+
     private final DcMotor intake;
     private final Servo intakeArmServo;
     private final DcMotorEx outtakeMotor;
+
+    private final CRServo  leftVerticalServo, rightVerticalServo;
 
     // Tunables
     private final int shortShotVelocity = 1400; // spin power
@@ -48,11 +59,16 @@ public class ShooterSubsystem {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
         intake = hardwareMap.get(DcMotor.class, "intake");
         intakeArmServo = hardwareMap.get(Servo.class, "intakeArmServo");
+        leftVerticalServo = hardwareMap.get(CRServo.class, "leftVerticalServo");
+        rightVerticalServo = hardwareMap.get(CRServo.class, "rightVerticalServo");
+
 
 
         // Encoder logic -------------------------------------------------
         outtakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        leftVerticalServo.setDirection(CRServo.Direction.REVERSE);
+        rightVerticalServo.setDirection(CRServo.Direction.REVERSE);
 
         // Set motor directions (adjust if movement is inverted) ----------
         outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -169,6 +185,13 @@ public class ShooterSubsystem {
         outtakeMotor.setVelocity(ejectVelocity);
     }
 
+    public void manualAngling( double vertical){
+        double anglePower = vertical * angSpeed;
+        leftVerticalServo.setPower(anglePower);
+        rightVerticalServo.setPower(-anglePower);
+    }
+
+
     public void startIntake() {
         intake.setPower(1);
     }
@@ -198,5 +221,7 @@ public class ShooterSubsystem {
 
     public boolean isBusy() { return busy; }
     public State getState() { return state; }
+
+
 }
     

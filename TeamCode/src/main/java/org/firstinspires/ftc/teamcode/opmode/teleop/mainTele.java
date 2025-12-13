@@ -52,7 +52,7 @@ public class mainTele extends LinearOpMode {
             // Turn Turret ---------------------------------------------------------------
             robot.turret.manualAiming(horizontal);
             // Change Launch Angle -------------------------------------------------------
-            robot.turret.manualAngling(vertical);
+            robot.shooter.manualAngling(vertical);
             // Initiate a short shot -----------------------------------------------------
             if (gamepad2.y && !YPressedLast) {
                     robot.shooter.startShot(1, "short");
