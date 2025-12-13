@@ -18,7 +18,7 @@ public class Robot {
 
     public VisionSubsystem vision;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
+    public Robot(HardwareMap hardwareMap) {
         // Initialize all subsystems in a controlled, predictable order
         turret = new TurretSubsystem(hardwareMap);
         drive = new DriveSubsystem(hardwareMap);

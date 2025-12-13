@@ -25,7 +25,7 @@ public class mainTele extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         telemetry.addLine("Ready to drive!");
 
-        robot = new Robot(hardwareMap, telemetry);
+        robot = new Robot(hardwareMap);
 
 
         waitForStart();
@@ -38,7 +38,6 @@ public class mainTele extends LinearOpMode {
             double strafe = gamepad1.left_stick_x;  // Strafe
             double turn = gamepad1.right_stick_x; // Rotation
             // Read Joystick Values for Gamepad 2 ---------------------------------------
-            double horizontal = -gamepad2.right_stick_x;
             double vertical = -gamepad2.left_stick_y;
 
             // Change Speed --------------------------------------------------------------
@@ -52,9 +51,12 @@ public class mainTele extends LinearOpMode {
             }
 
             // Turn Turret ---------------------------------------------------------------
-            robot.turret.manualAiming(horizontal);
+            robot.turret.manualAiming(-gamepad2.right_stick_x);
+            robot.turret.periodic();
+
             // Change Launch Angle -------------------------------------------------------
             robot.shooter.manualAngling(vertical);
+
             // Initiate a short shot -----------------------------------------------------
             if (gamepad2.y && !YPressedLast) {
                     robot.shooter.startShot(1, "short");

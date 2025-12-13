@@ -40,7 +40,7 @@ public class autoAprilTag extends LinearOpMode {
         telemetry.addLine("Ready to drive!");
         telemetry.update();
         
-        robot = new Robot(hardwareMap, telemetry);
+        robot = new Robot(hardwareMap);
 
         waitForStart();
         
