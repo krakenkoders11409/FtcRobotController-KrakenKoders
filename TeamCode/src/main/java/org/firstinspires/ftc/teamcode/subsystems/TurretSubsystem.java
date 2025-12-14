@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
@@ -10,8 +9,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TurretSubsystem {
 
     public enum State { IDLE, MANUAL, MOVING_TO_TARGET, HOMING }
+    public String debugging = "";
 
-    private final DcMotorEx turntableMotor;
+    private final DcMotor turntableMotor;
 
     // “Soft limits” in encoder ticks (tune these!)
     private final int turretMinTicks = -1200;
@@ -28,7 +28,7 @@ public class TurretSubsystem {
     private int currentTicks = 0;
 
    public TurretSubsystem(HardwareMap hardwareMap) {
-        turntableMotor = hardwareMap.get(DcMotorEx.class, "turntableMotor");
+        turntableMotor = hardwareMap.get(DcMotor.class, "turntableMotor");
         
 
         // Set directions (adjust if movement is inverted) ----------
@@ -54,12 +54,13 @@ public class TurretSubsystem {
         // Safety: don’t drive past soft limits
         int pos = turntableMotor.getCurrentPosition();
         if ((pos <= turretMinTicks && joystickX < 0) || (pos >= turretMaxTicks && joystickX > 0)) {
+            debugging = "inside soft limits";
             turntableMotor.setPower(0);
             return;
         }
 
         // Power scale (tune!)
-        double power = joystickX * 0.4; // try 0.2–0.6 depending on gearing
+        double power = joystickX * 0.6; // try 0.2–0.6 depending on gearing
         turntableMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turntableMotor.setPower(power);
     }
@@ -119,6 +120,7 @@ public class TurretSubsystem {
         telemetry.addLine("----- Turret -----");
         telemetry.addData("State", state);
         telemetry.addData("CurrentTicks", turntableMotor.getCurrentPosition());
+        telemetry.addData("debugging", debugging);
 
 
     }
