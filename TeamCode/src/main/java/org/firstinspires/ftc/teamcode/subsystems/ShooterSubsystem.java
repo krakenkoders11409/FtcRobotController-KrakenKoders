@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static java.lang.Thread.sleep;
-
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,7 +13,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import java.util.Objects;
 
 public class ShooterSubsystem {
-    public enum State { IDLE, SPIN_UP, FEED, SPIN_DOWN, EJECT }
+    public enum State {
+        IDLE,
+        SPIN_UP,
+
+        LIFT_UP, // Servo goes to position 0.5
+        LIFT_HOLD, // Servo waits
+        LIFT_DOWN, // Servo goes to position 0.8
+
+        FEED,
+        SPIN_DOWN,
+        EJECT
+    }
 
     // Setup for Angling Servos -----------------------------------------------------------
     private final double angleMax = 1;
@@ -53,6 +62,11 @@ public class ShooterSubsystem {
     private int numberOfShots = 0;
     private int numberOfBalls = 0;
     private double lastVelocity = 0;
+
+    // Lift Tunables
+    private static final double LIFT_UP_POS = 0.5;
+    private static final double LIFT_DOWN_POS = 0.8;
+    private static final long LIFT_HOLD_MS = 900;
 
 
     public ShooterSubsystem(HardwareMap hardwareMap) {
@@ -106,67 +120,76 @@ public class ShooterSubsystem {
     /** Call this every loop to advance the sequence without blocking. */
     public void update() {
         switch (state) {
+
             case IDLE:
-                // nothing
                 break;
 
             case SPIN_UP:
                 lastVelocity = outtakeMotor.getVelocity();
-                if (shotType == "short"){
-                    if (Math.abs(shortShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                    //if (timer.milliseconds() >= spinUpMs) {
-                        state = State.FEED;
-                        timer.reset();
-                        intake.setPower(intakePower); // push ball into shooter
-                        intakeArmServo.setPosition(0);
-                    }
-                } else {
-                    if (Math.abs(longShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                    //if (timer.milliseconds() >= spinUpMs) {
-                        state = State.FEED;
-                        timer.reset();
-                        intake.setPower(intakePower); // push ball into shooter
-                        intakeArmServo.setPosition(0);
-                    }
+
+                int targetVel = shotType.equals("short")
+                        ? shortShotVelocity
+                        : longShotVelocity;
+
+                if (Math.abs(targetVel - lastVelocity) < velocityTolerance) {
+                    timer.reset();
+                    intakeArmServo.setPosition(0.5);   // start lift
+                    state = State.LIFT_UP;
                 }
-                
                 break;
 
-            case EJECT:
-                lastVelocity=  outtakeMotor.getVelocity();
-                if (Math.abs(ejectVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                // if (timer.milliseconds() >= spinUpMs) {
-                    state = State.FEED;
-                    timer.reset();
-                    intake.setPower(intakePower); // push ball into shooter
-                    intakeArmServo.setPosition(0);
+            case LIFT_UP:
+                // give servo one loop to move
+                timer.reset();
+                state = State.LIFT_HOLD;
+                break;
+
+            case LIFT_HOLD:
+                if (timer.milliseconds() >= 900) {
+                    intakeArmServo.setPosition(0.8);   // lower arm
+                    state = State.LIFT_DOWN;
                 }
+                break;
+
+            case LIFT_DOWN:
+                // no delay needed here
+                timer.reset();
+                intake.setPower(intakePower);
+                state = State.FEED;
                 break;
 
             case FEED:
                 if (timer.milliseconds() >= feedMs) {
-                    state = State.SPIN_DOWN;
-                    timer.reset();
-                    outtakeMotor.setVelocity(0);
                     intake.setPower(0);
+                    outtakeMotor.setVelocity(0);
+                    timer.reset();
+                    state = State.SPIN_DOWN;
                 }
                 break;
 
             case SPIN_DOWN:
-                if (numberOfShots > 1){
-                    state = State.SPIN_UP;
-                    if (shotType == "short") {
-                    outtakeMotor.setVelocity(shortShotVelocity);
-                    } else {
-                        outtakeMotor.setVelocity(longShotVelocity);
-                    }
-                    intakeArmServo.setPosition(1);
+                if (numberOfShots > 1) {
                     numberOfShots--;
-                    //telemetry.addLine("Shots left:" + numberOfShots);
-                }
-                if (timer.milliseconds() >= spinDownMs) {
+                    timer.reset();
+                    outtakeMotor.setVelocity(
+                            shotType.equals("short")
+                                    ? shortShotVelocity
+                                    : longShotVelocity
+                    );
+                    state = State.SPIN_UP;
+                } else if (timer.milliseconds() >= spinDownMs) {
                     state = State.IDLE;
                     busy = false;
+                }
+                break;
+
+            case EJECT:
+                lastVelocity = outtakeMotor.getVelocity();
+                if (Math.abs(ejectVelocity - lastVelocity) < velocityTolerance) {
+                    intake.setPower(intakePower);
+                    intakeArmServo.setPosition(0);
+                    timer.reset();
+                    state = State.FEED;
                 }
                 break;
         }
@@ -193,7 +216,14 @@ public class ShooterSubsystem {
         rightVerticalServo.setPower(-anglePower);
     }
 
+    public void liftBall(){
+        if (state != State.LIFT_HOLD) return;{
+            intakeArmServo.setPosition(LIFT_UP_POS);
+            timer.reset();
+            state = state.LIFT_UP;
 
+        }
+    }
     public void startIntake() {
         intake.setPower(1);
     }
@@ -201,16 +231,8 @@ public class ShooterSubsystem {
     public void stopIntake() {
         intake.setPower(0);
     }
-    private double pos;
 
-    public void liftBall() throws InterruptedException {
-        intakeArmServo.setPosition(0.5);
-        pos = intakeArmServo.getPosition();
-        sleep(900);
-        intakeArmServo.setPosition(0.8);
-        pos = intakeArmServo.getPosition();
-        sleep(100);
-    }
+
 
     public void startOuttake() {
         outtakeMotor.setPower(1);
@@ -223,7 +245,8 @@ public class ShooterSubsystem {
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addLine("----- Shooter -----");
         telemetry.addData("Shooter Velocity = ", lastVelocity);
-        telemetry.addData("Servo Position = ", pos);
+        telemetry.addData("Servo Position = ", intakeArmServo.getPosition());
+        telemetry.addData("Shooter State = ", state);
     }
 
     public boolean isBusy() { return busy; }
