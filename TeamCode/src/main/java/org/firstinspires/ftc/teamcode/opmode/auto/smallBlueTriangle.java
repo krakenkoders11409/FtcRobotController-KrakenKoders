@@ -12,7 +12,7 @@ public class smallBlueTriangle extends LinearOpMode {
     
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(hardwareMap, telemetry);
+        Robot robot = new Robot(hardwareMap);
         
 
         //telemetry.addData("Status", "Initialized");

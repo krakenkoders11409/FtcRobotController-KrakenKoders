@@ -18,9 +18,9 @@ public class Robot {
 
     public VisionSubsystem vision;
 
-    public Robot(HardwareMap hardwareMap, Telemetry telemetry) {
+    public Robot(HardwareMap hardwareMap) {
         // Initialize all subsystems in a controlled, predictable order
-        turret = new TurretSubsystem(hardwareMap, telemetry);
+        turret = new TurretSubsystem(hardwareMap);
         drive = new DriveSubsystem(hardwareMap);
         shooter = new ShooterSubsystem(hardwareMap);
         vision = new VisionSubsystem(hardwareMap);
@@ -31,6 +31,7 @@ public class Robot {
         drive.addTelemetry(telemetry);
         shooter.addTelemetry(telemetry);
         vision.addTelemetry(telemetry);
+        turret.addTelemetry(telemetry);
     }
 
     /** Called every control loop — optional, but great practice */

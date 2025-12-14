@@ -19,7 +19,7 @@ public class Test extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        robot = new Robot(hardwareMap, telemetry);
+        robot = new Robot(hardwareMap);
         
         // April Tag Detection ------------------------------------
         
