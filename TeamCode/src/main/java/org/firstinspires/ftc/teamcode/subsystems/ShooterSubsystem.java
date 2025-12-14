@@ -43,17 +43,12 @@ public class ShooterSubsystem {
     private final int ejectVelocity = 1000;
     private final double targetPower = 1.0; // spin power
     private final double intakePower = 1.0; // spin power
-    private final long spinUpMs = 2000; // wait time before feed
-    private final long feedMs = 1000; // time to press the ball
-    private final long spinDownMs = 1000; // optional coast-down window
     private final int velocityTolerance = 35; // how far away from the target velocity is OK
     private String shotType = "";
 
     private final ElapsedTime timer = new ElapsedTime();
     private State state = State.IDLE;
     private boolean busy = false;
-    private boolean toggleState = false;
-    private boolean previousTrigger = false;
 
 
     private int numberOfShots = 0;
@@ -63,7 +58,6 @@ public class ShooterSubsystem {
     // Lift Tunables
     private static final double LIFT_UP_POS = 0.5;
     private static final double LIFT_DOWN_POS = 0.8;
-    private static final long LIFT_HOLD_MS = 900;
 
 
     public ShooterSubsystem(HardwareMap hardwareMap) {
@@ -119,30 +113,29 @@ public class ShooterSubsystem {
 
             case SPIN_UP:
                 lastVelocity = outtakeMotor.getVelocity();
-
                 int targetVel = shotType.equals("short") ? shortShotVelocity : longShotVelocity;
 
                 if (Math.abs(targetVel - lastVelocity) < velocityTolerance) {
-                    timer.reset();
-                    intakeArmServo.setPosition(0.5);   // start lift
                     intake.setPower(0);
+
+                    intakeArmServo.setPosition(LIFT_UP_POS);   // start lift
+                    timer.reset();
                     state = State.SERVO_UP;
                 }
                 break;
 
             case SERVO_UP:
                 // give servo one loop to move
-                if (intakeArmServo.getPosition() == 0.5) {
+                if (timer.milliseconds() > 250) {
+                    intakeArmServo.setPosition(LIFT_DOWN_POS);   // lower arm
                     timer.reset();
-                    intakeArmServo.setPosition(0.8);   // lower arm
                     state = State.SERVO_DOWN;
                 }
                 break;
 
             case SERVO_DOWN:
                 // no delay needed here
-                if (intakeArmServo.getPosition() == 0.8) {
-                    timer.reset();
+                if (timer.milliseconds() > 250) {
                     state = State.SPIN_DOWN;
                 }
                 break;
