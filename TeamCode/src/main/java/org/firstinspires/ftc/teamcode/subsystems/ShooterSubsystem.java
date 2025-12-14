@@ -20,6 +20,7 @@ public class ShooterSubsystem {
         LIFT_HOLD, // Servo waits
         SERVO_DOWN, // Servo goes to position 0.8
         SPIN_DOWN,
+        REVERSE_INTAKE,
         SPIN_UP_EJECT
     }
 
@@ -35,11 +36,11 @@ public class ShooterSubsystem {
     private final Servo intakeArmServo;
     private final DcMotorEx outtakeMotor;
 
-    private final CRServo  leftVerticalServo, rightVerticalServo;
+    private final Servo leftVerticalServo, rightVerticalServo;
 
     // Tunables
-    private final int shortShotVelocity = 1400; // spin power
-    private final int longShotVelocity = 2000; // spin power
+    private final int shortShotVelocity = 800; // spin power
+    private final int longShotVelocity = 1100; // spin power
     private final int ejectVelocity = 1000;
     private final double targetPower = 1.0; // spin power
     private final double intakePower = 1.0; // spin power
@@ -49,6 +50,7 @@ public class ShooterSubsystem {
     private final ElapsedTime timer = new ElapsedTime();
     private State state = State.IDLE;
     private boolean busy = false;
+    private boolean isAuto = false;
 
 
     private int numberOfShots = 0;
@@ -57,23 +59,23 @@ public class ShooterSubsystem {
 
     // Lift Tunables
     private static final double LIFT_UP_POS = 0.5;
-    private static final double LIFT_DOWN_POS = 0.8;
+    private static final double LIFT_DOWN_POS = 0.9;
+    private static final double LIFT_TIME = 600;
 
 
     public ShooterSubsystem(HardwareMap hardwareMap) {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
         intake = hardwareMap.get(DcMotor.class, "intake");
         intakeArmServo = hardwareMap.get(Servo.class, "intakeArmServo");
-        leftVerticalServo = hardwareMap.get(CRServo.class, "leftVerticalServo");
-        rightVerticalServo = hardwareMap.get(CRServo.class, "rightVerticalServo");
-
+        leftVerticalServo = hardwareMap.get(Servo.class, "leftVerticalServo");
+        rightVerticalServo = hardwareMap.get(Servo.class, "rightVerticalServo");
 
 
         // Encoder logic -------------------------------------------------
         outtakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        leftVerticalServo.setDirection(CRServo.Direction.REVERSE);
-        rightVerticalServo.setDirection(CRServo.Direction.REVERSE);
+        leftVerticalServo.setDirection(Servo.Direction.REVERSE);
+        rightVerticalServo.setDirection(Servo.Direction.REVERSE);
 
         // Set motor directions (adjust if movement is inverted) ----------
         outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -85,9 +87,11 @@ public class ShooterSubsystem {
         outtakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
     }
 
-    /** Start a single, timed shot. Returns immediately (non-blocking). */
+    /**
+     * Start a single, timed shot. Returns immediately (non-blocking).
+     */
     public void startShot(int shots, String type) {
-        if(busy) {
+        if (busy) {
             return; // ignore if already running
         }
         numberOfShots = shots;
@@ -95,16 +99,22 @@ public class ShooterSubsystem {
         busy = true;
         state = State.SPIN_UP;
         timer.reset();
+        if (shots > 1) {
+            isAuto = true;
+            intake.setPower(1);
+        }
 
-        if (Objects.equals(shotType, "short")){
+        if (Objects.equals(shotType, "short")) {
             outtakeMotor.setVelocity(shortShotVelocity);
         } else {
             outtakeMotor.setVelocity(longShotVelocity);
         }
-        intake.setPower(1);
+//        intake.setPower(1);
     }
 
-    /** Call this every loop to advance the sequence without blocking. */
+    /**
+     * Call this every loop to advance the sequence without blocking.
+     */
     public void update() {
         switch (state) {
 
@@ -116,17 +126,20 @@ public class ShooterSubsystem {
                 int targetVel = shotType.equals("short") ? shortShotVelocity : longShotVelocity;
 
                 if (Math.abs(targetVel - lastVelocity) < velocityTolerance) {
-                    intake.setPower(0);
+                    if (!isAuto) {
+                        intake.setPower(0);
+                    }
 
                     intakeArmServo.setPosition(LIFT_UP_POS);   // start lift
                     timer.reset();
                     state = State.SERVO_UP;
+
                 }
                 break;
 
             case SERVO_UP:
                 // give servo one loop to move
-                if (timer.milliseconds() > 250) {
+                if (timer.milliseconds() > LIFT_TIME) {
                     intakeArmServo.setPosition(LIFT_DOWN_POS);   // lower arm
                     timer.reset();
                     state = State.SERVO_DOWN;
@@ -135,7 +148,7 @@ public class ShooterSubsystem {
 
             case SERVO_DOWN:
                 // no delay needed here
-                if (timer.milliseconds() > 250) {
+                if (timer.milliseconds() > LIFT_TIME) {
                     state = State.SPIN_DOWN;
                 }
                 break;
@@ -167,37 +180,46 @@ public class ShooterSubsystem {
                     state = State.SERVO_UP;
                 }
                 break;
+            case REVERSE_INTAKE:
+                // no delay needed here
+                intake.setPower(-1);
+                if (timer.milliseconds() > 2000) {
+//                    intake.setPower(0);
+                    state = State.IDLE;
+                }
+                break;
+
         }
     }
-    
+
     public void eject(int balls) {
-        if(busy) { 
-            //telemetry.addLine("Shooter is busy");
+        if (busy) {
             return; // ignore if already running
         }
         numberOfBalls = balls;
-        //telemetry.addLine("Ejection Initiated");
         busy = true;
         state = State.SPIN_UP_EJECT;
         timer.reset();
 
-        // launcher.setPower(targetPower);
         outtakeMotor.setVelocity(ejectVelocity);
     }
 
-    public void manualAngling( double vertical){
-        double anglePower = vertical * angSpeed;
-        leftVerticalServo.setPower(anglePower);
-        rightVerticalServo.setPower(-anglePower);
+    public void reverseIntake() {
+        if (state == State.IDLE) {
+            timer.reset();
+            state = State.REVERSE_INTAKE;
+        }
     }
 
+
     public void liftBall(){
-        if (state != State.LIFT_HOLD) return;{
+        if (state == State.IDLE) {
             intakeArmServo.setPosition(LIFT_UP_POS);
             timer.reset();
             state = state.SERVO_UP;
 
         }
+        
     }
     public void startIntake() {
         intake.setPower(1);

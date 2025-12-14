@@ -54,26 +54,26 @@ public class mainTele extends LinearOpMode {
             robot.turret.manualAiming(-gamepad2.right_stick_x);
             robot.turret.periodic();
 
-            // Change Launch Angle -------------------------------------------------------
-            robot.shooter.manualAngling(vertical);
-
             // Initiate a short shot -----------------------------------------------------
-            if (gamepad2.y && !YPressedLast) {
+            if (gamepad2.a && !APressedLast) {
                     robot.shooter.startShot(1, "short");
             }
 
             // Initiate a long shot ------------------------------------------------------
-            if (gamepad2.a && !APressedLast) {
+            if (gamepad2.y && !YPressedLast) {
                     robot.shooter.startShot(1, "long");
             }
+
             // Manually control the intakes -----------------------------------------------
+            if (gamepad2.left_bumper)  {
+                robot.shooter.startIntake();
+            } else {
+                robot.shooter.stopIntake();
+            }
+
             if (!robot.shooter.isBusy()) {
                 // Control the first intake
-                if (gamepad2.left_bumper)  {
-                    robot.shooter.startIntake();
-                } else {
-                    robot.shooter.stopIntake();
-                }
+
                 if (gamepad2.dpad_up) {
                     robot.shooter.liftBall();
                 }
@@ -86,6 +86,13 @@ public class mainTele extends LinearOpMode {
                     robot.shooter.stopOuttake();
                 }
             }
+
+                if (gamepad2.b && !BPressedLast) {
+                robot.shooter.reverseIntake();
+            }
+
+
+
 
             robot.drive.drive(forward, strafe, turn);
 

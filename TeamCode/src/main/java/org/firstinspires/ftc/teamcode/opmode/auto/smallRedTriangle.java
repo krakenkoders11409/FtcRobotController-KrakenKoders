@@ -39,7 +39,7 @@ public class smallRedTriangle extends LinearOpMode {
 
         robot.drive.resetEncoders();
         robot.drive.setRunToPositionMode();
-        robot.drive.setTargetForwardInches(-36, .8); // TODO: I'm not sure if a negative distance actually makes it go backwards.. it should right?
+        robot.drive.setTargetForwardInches(36, .8); // TODO: I'm not sure if a negative distance actually makes it go backwards.. it should right?
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()){

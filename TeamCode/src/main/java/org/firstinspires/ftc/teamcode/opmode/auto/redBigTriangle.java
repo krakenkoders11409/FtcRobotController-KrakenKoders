@@ -38,9 +38,17 @@ public class redBigTriangle extends LinearOpMode {
 
         robot.drive.resetEncoders();
         robot.drive.setRunToPositionMode();
-        robot.drive.setTargetForwardInches(36, .8);
+
+
+        robot.drive.setTargetForwardInches(-36, 0.8);
         sleep(100);
-        robot.shooter.startShot(3, "short");
+
+        robot.shooter.startIntake();
+        sleep(100);
+        robot.shooter.stopIntake();
+        sleep(100);
+        robot.shooter.startShot(2, "short");
+
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()){

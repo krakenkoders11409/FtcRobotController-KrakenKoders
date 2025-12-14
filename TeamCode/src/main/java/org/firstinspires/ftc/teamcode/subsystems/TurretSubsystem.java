@@ -9,13 +9,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TurretSubsystem {
 
     public enum State { IDLE, MANUAL, MOVING_TO_TARGET, HOMING }
-    public String debugging = "";
+    public double debugging = 0.0;
 
     private final DcMotor turntableMotor;
 
     // “Soft limits” in encoder ticks (tune these!)
-    private final int turretMinTicks = -1200;
-    private final int turretMaxTicks =  1200;
+    private final int turretMinTicks = -275;
+    private final int turretMaxTicks =  275;
 
     // The encoder tick that represents “straight ahead”
     // If you add a home sensor later, you’ll set this after homing.
@@ -54,15 +54,16 @@ public class TurretSubsystem {
         // Safety: don’t drive past soft limits
         int pos = turntableMotor.getCurrentPosition();
         if ((pos <= turretMinTicks && joystickX < 0) || (pos >= turretMaxTicks && joystickX > 0)) {
-            debugging = "inside soft limits";
             turntableMotor.setPower(0);
             return;
         }
 
         // Power scale (tune!)
-        double power = joystickX * 0.6; // try 0.2–0.6 depending on gearing
+        //double power = joystickX * 0.6; // try 0.2–0.6 depending on gearing
+        debugging = joystickX;
+
         turntableMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turntableMotor.setPower(power);
+        turntableMotor.setPower(joystickX);
     }
 
     /**
@@ -118,9 +119,9 @@ public class TurretSubsystem {
 
     public void addTelemetry (Telemetry telemetry){
         telemetry.addLine("----- Turret -----");
-        telemetry.addData("State", state);
-        telemetry.addData("CurrentTicks", turntableMotor.getCurrentPosition());
-        telemetry.addData("debugging", debugging);
+        telemetry.addData("State: ", state);
+        telemetry.addData("CurrentTicks: ", currentTicks);
+        telemetry.addData("joystickX: ", debugging);
 
 
     }

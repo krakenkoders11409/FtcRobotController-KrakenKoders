@@ -39,9 +39,11 @@ public class blueBigTriangle extends LinearOpMode {
         
         robot.drive.resetEncoders();
         robot.drive.setRunToPositionMode();
-        robot.drive.setTargetForwardInches(36, .8);
+        robot.drive.setTargetForwardInches(-36, .4);
         sleep(500);
+        //robot.shooter.startIntake();
         robot.shooter.startShot(3, "short");
+        robot.shooter.stopIntake();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()){
