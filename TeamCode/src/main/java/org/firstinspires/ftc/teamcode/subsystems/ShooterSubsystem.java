@@ -60,7 +60,7 @@ public class ShooterSubsystem {
     // Lift Tunables
     private static final double LIFT_UP_POS = 0.5;
     private static final double LIFT_DOWN_POS = 0.9;
-    private static final double LIFT_TIME = 600;
+    private static final double LIFT_TIME = 900;
 
 
     public ShooterSubsystem(HardwareMap hardwareMap) {

@@ -36,18 +36,28 @@ public class blueBigTriangle extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-        
+
         robot.drive.resetEncoders();
         robot.drive.setRunToPositionMode();
-        robot.drive.setTargetForwardInches(-36, .4);
-        sleep(500);
-        //robot.shooter.startIntake();
-        robot.shooter.startShot(3, "short");
-        robot.shooter.stopIntake();
+        robot.drive.setTargetForwardInches(-36, 0.4);
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()){
+// DO NOT sleep here unless mechanically required
+        robot.shooter.startShot(1, "short");
+
+        while (opModeIsActive() && robot.shooter.isBusy()) {
+            robot.shooter.update();
+            robot.addTelemetry(telemetry);
+            telemetry.update();
+        }
+
+// Shot is DONE here
+        robot.drive.setTargetInches(0, 15, 0, -0.4);
+        robot.shooter.liftBall();
+
+// Keep subsystems alive
+        while (opModeIsActive()) {
             robot.shooter.update();
         }
+
     }
 }

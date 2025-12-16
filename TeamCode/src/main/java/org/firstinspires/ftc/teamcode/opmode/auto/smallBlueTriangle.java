@@ -22,7 +22,7 @@ public class smallBlueTriangle extends LinearOpMode {
 
         robot.drive.resetEncoders();
         robot.drive.setRunToPositionMode();
-        robot.drive.setTargetForwardInches(-36, 0.8);
+        robot.drive.setTargetInches(24, 10, 0, 0.4);
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()){

@@ -79,7 +79,7 @@ public class DriveSubsystem {
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addLine("----- Motors -----");
         telemetry.addData("FL Power", lastLfPower);
-        telemetry.addData("FR Power", (-1 *lastRfPower));
+        telemetry.addData("FR Power", (-1 * lastRfPower));
         telemetry.addData("BL Power", lastLbPower);
         telemetry.addData("BR Power", lastRbPower);
     }
@@ -123,4 +123,34 @@ public class DriveSubsystem {
         backLeftMotor.setPower(power);
         backRightMotor.setPower(power);
     }
+
+    public void setTargetInches(double forwardInches, double strafeInches, double turnInches, double power) {
+
+        int forwardTicks = (int) Math.round(forwardInches * TICKS_PER_INCH);
+        int strafeTicks = (int) Math.round(strafeInches * TICKS_PER_INCH);
+        int turnTicks = (int) Math.round(turnInches * TICKS_PER_INCH); // see note below
+
+        int flTarget = frontLeftMotor.getCurrentPosition()
+                + forwardTicks + strafeTicks + turnTicks;
+
+        int frTarget = frontRightMotor.getCurrentPosition()
+                + forwardTicks - strafeTicks - turnTicks;
+
+        int blTarget = backLeftMotor.getCurrentPosition()
+                + forwardTicks - strafeTicks + turnTicks;
+
+        int brTarget = backRightMotor.getCurrentPosition()
+                + forwardTicks + strafeTicks - turnTicks;
+
+        frontLeftMotor.setTargetPosition(flTarget);
+        frontRightMotor.setTargetPosition(frTarget);
+        backLeftMotor.setTargetPosition(blTarget);
+        backRightMotor.setTargetPosition(brTarget);
+
+        frontLeftMotor.setPower(power);
+        frontRightMotor.setPower(power);
+        backLeftMotor.setPower(power);
+        backRightMotor.setPower(power);
+    }
+
 }
