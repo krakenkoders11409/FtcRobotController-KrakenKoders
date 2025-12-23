@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmode.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 //import org.firstinspires.ftc.teamcode.SimpleLedController;
@@ -19,8 +18,8 @@ public class mainTele extends LinearOpMode {
     boolean BPressedLast = false;
     boolean XPressedLast = false;
     boolean YPressedLast = false;
-    
-    
+
+
     //@Override
     public void runOpMode() throws InterruptedException {
         telemetry.addLine("Ready to drive!");
@@ -31,7 +30,7 @@ public class mainTele extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            robot.periodic();
+            robot.UpdatePeriodic();
 
             // Read joystick Values  for Gamepad 1 --------------------------------------
             double forward = -gamepad1.left_stick_y; // Forward is negative on the stick
@@ -86,6 +85,9 @@ public class mainTele extends LinearOpMode {
             }
 
             robot.drive.drive(forward, strafe, turn);
+
+            // Loop updates
+            robot.UpdatePeriodic();
 
             // Display info on driver station --------------------------------
             robot.addTelemetry(telemetry);

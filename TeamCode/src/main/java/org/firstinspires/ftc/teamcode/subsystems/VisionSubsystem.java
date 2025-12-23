@@ -10,13 +10,11 @@ public class VisionSubsystem {
 
     // Raw Limelight values
     private boolean hasTarget = false;
+
+    private double robotYawDeg = 0.0;
     private double tx;    // horizontal offset
     private double ty;    // vertical offset
     private double ta;    // target area
-    private boolean tv;   // valid target?
-
-    // Control flags
-    private boolean aimAssistEnabled = false;
 
     // Lime Light Instance Builder
     public VisionSubsystem(HardwareMap hardwareMap) {
@@ -30,53 +28,27 @@ public class VisionSubsystem {
 
         // Start background polling thread
         limelight.start();
-
-
     }
 
-    public void addTelemetry(Telemetry telemetry) {
-        telemetry.addLine("----- Vision -----");
-        telemetry.addData("Target X", tx);
-        telemetry.addData("Target Y", ty);
-        telemetry.addData("Target Area", ta);
-        telemetry.addData("hasTarget = ", hasTarget);
+    // --- Change pipelines if you add more in the web UI. ---
+    public void setPipeline(int index) {
+        limelight.pipelineSwitch(index);
     }
-
-    public void periodic() {
-        LLResult result = limelight.getLatestResult();
-
-        if (result != null && result.isValid()) {
-            hasTarget = true;
-            tx = result.getTx();
-            ty = result.getTy();
-            ta = result.getTa();
-        } else {
-            hasTarget = false;
-        }
-    }
-
-    // --- Public API for rest of robot ---
-
-    public boolean hasTarget() {
-        return hasTarget;
-    }
-
-    public double getTx() {
-        return tx;
-    }
-
-    public double getTy() {
-        return ty;
-    }
-
-    public double getTa() {
-        return ta;
-    }
-
     /**
      * Simple steering correction value you can feed into your drive turn value.
      * Tunable proportional gain (kP).
      */
+
+    public void updateRobotOrientation(double robotHeadingDeg) {
+        // FTC IMU is CW-positive
+        // Limelight expects CCW-positive;
+        robotYawDeg = robotHeadingDeg;
+
+        double limelightYawDeg = -robotHeadingDeg;
+        limelight.updateRobotOrientation(limelightYawDeg);
+    }
+
+
     public double getSteeringCorrection() {
         if (!hasTarget) return 0.0;
 
@@ -91,8 +63,26 @@ public class VisionSubsystem {
         return correction;
     }
 
-    /** Change pipelines if you add more in the web UI. */
-    public void setPipeline(int index) {
-        limelight.pipelineSwitch(index);
+    public void periodic() {
+        LLResult result = limelight.getLatestResult();
+
+        if (result != null && result.isValid()) {
+            hasTarget = true;
+            tx = result.getTx();
+            ty = result.getTy();
+            ta = result.getTa();
+        } else {
+            hasTarget = false;
+        }
     }
+    public void addTelemetry(Telemetry telemetry) {
+        telemetry.addLine("----- Vision -----");
+        telemetry.addData("Robot Yaw (deg)", robotYawDeg);
+        telemetry.addData("Has Target", hasTarget);
+        telemetry.addData("tx", tx);
+        telemetry.addData("ty", ty);
+        telemetry.addData("ta", ta);
+    }
+
+
 }
