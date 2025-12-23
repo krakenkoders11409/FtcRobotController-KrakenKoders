@@ -26,7 +26,7 @@ public class VisionSubsystem {
         limelight.setPollRateHz(100);
 
         // Start with pipeline 0 (configure in Limelight UI)
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(2);
 
         // Start background polling thread
         limelight.start();
@@ -96,3 +96,5 @@ public class VisionSubsystem {
         limelight.pipelineSwitch(index);
     }
 }
+// int[] validIDs = {3,4}; // For if we want to single out april tags
+//LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
