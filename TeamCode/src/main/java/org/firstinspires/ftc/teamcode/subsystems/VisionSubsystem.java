@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -9,12 +11,21 @@ public class VisionSubsystem {
     private final Limelight3A limelight;
 
     // Raw Limelight values
-    private boolean hasTarget = false;
+    public boolean hasTarget = false;
+    public boolean hasFieldPose = false;
 
-    private double robotYawDeg = 0.0;
+
+    // Tag offsets
     private double tx;    // horizontal offset
     private double ty;    // vertical offset
     private double ta;    // target area
+
+    // Field pose (meters, degrees)
+    private double fieldX = 0.0;
+    private double fieldY = 0.0;
+    private double fieldYaw = 0.0;
+    // Robot Yaw
+    private double robotYawDeg = 0.0;
 
     // Lime Light Instance Builder
     public VisionSubsystem(HardwareMap hardwareMap) {
@@ -38,17 +49,6 @@ public class VisionSubsystem {
      * Simple steering correction value you can feed into your drive turn value.
      * Tunable proportional gain (kP).
      */
-
-    public void updateRobotOrientation(double robotHeadingDeg) {
-        // FTC IMU is CW-positive
-        // Limelight expects CCW-positive;
-        robotYawDeg = robotHeadingDeg;
-
-        double limelightYawDeg = -robotHeadingDeg;
-        limelight.updateRobotOrientation(limelightYawDeg);
-    }
-
-
     public double getSteeringCorrection() {
         if (!hasTarget) return 0.0;
 
@@ -63,18 +63,67 @@ public class VisionSubsystem {
         return correction;
     }
 
+    // --- Field Data ---
+    public void updateRobotOrientation(double robotHeadingDeg) {
+        robotYawDeg = robotHeadingDeg;
+
+        double limelightYawDeg = -robotHeadingDeg;
+        limelight.updateRobotOrientation(limelightYawDeg);
+    }
+
+    public double getFieldX() {
+        return fieldX; }
+    public double getFieldY() {
+        return fieldY; }
+    public double getFieldYaw() {
+        return fieldYaw; }
+    public boolean hasFieldPose() {
+        return hasFieldPose;
+    }
+
+
+
     public void periodic() {
         LLResult result = limelight.getLatestResult();
 
         if (result != null && result.isValid()) {
             hasTarget = true;
+
+            // 2D offsets
             tx = result.getTx();
             ty = result.getTy();
             ta = result.getTa();
+
+            // ---- 3D robot pose from AprilTags ----
+            // Try the MT2 (MegaTag2) fused pose first:
+            Pose3D botposeMT2 = result.getBotpose_MT2();
+            if (botposeMT2 != null) {
+                hasFieldPose = true;
+                fieldX = botposeMT2.getPosition().x;
+                fieldY = botposeMT2.getPosition().y;
+                // yaw is the rotation about vertical axis
+                fieldYaw = botposeMT2.getOrientation().getYaw(AngleUnit.DEGREES);
+            } else {
+                // Fall back to basic botpose if MT2 is unavailable
+                Pose3D botpose = result.getBotpose();
+                if (botpose != null) {
+                    hasFieldPose = true;
+                    fieldX = botpose.getPosition().x;
+                    fieldY = botpose.getPosition().y;
+                    fieldYaw = botpose.getOrientation().getYaw(AngleUnit.DEGREES);
+                } else {
+                    hasFieldPose = false;
+                }
+            }
         } else {
             hasTarget = false;
+            hasFieldPose = false;
         }
     }
+
+
+
+
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addLine("----- Vision -----");
         telemetry.addData("Robot Yaw (deg)", robotYawDeg);
@@ -82,7 +131,9 @@ public class VisionSubsystem {
         telemetry.addData("tx", tx);
         telemetry.addData("ty", ty);
         telemetry.addData("ta", ta);
+        telemetry.addLine("");
+        telemetry.addData("Field X (m)", fieldX);
+        telemetry.addData("Field Y (m)", fieldY);
+        telemetry.addData("Field Yaw (deg)","%.1f°", fieldYaw);
     }
-
-
 }
