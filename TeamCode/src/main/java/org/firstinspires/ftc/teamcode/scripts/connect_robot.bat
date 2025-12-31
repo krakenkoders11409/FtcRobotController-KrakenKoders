@@ -5,7 +5,7 @@ rem === CONFIGURATION ===
 set "ROBOT_SSID=11409-RC"
 set "ROBOT_PROFILE=114098-RC"
 set "WIFI_INTERFACE=Wi-Fi"
-set "ADB_IP=192.168.43.1"
+set "ADB_IP=192.168.43.1"q
 set "ADB_PORT=5555"
 
 echo Connecting to Wi-Fi network "%ROBOT_SSID%"...
