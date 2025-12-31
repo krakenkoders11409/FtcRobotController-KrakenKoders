@@ -48,6 +48,7 @@ public class Robot {
     public void addTelemetry(Telemetry telemetry) {
         drive.addTelemetry(telemetry);
         shooter.addTelemetry(telemetry);
+        turret.addTelemetry(telemetry);
         vision.addTelemetry(telemetry);
     }
 

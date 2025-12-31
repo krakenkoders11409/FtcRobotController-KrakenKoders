@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+
 
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,6 +14,7 @@ public class TurretSubsystem {
     private double TurretPos = 0;
     // Setup for Speed for both Turret and Angle -----------------------------------------
     private final double speed = 0.8;
+    double turnPower = 0;
     
     
 
@@ -23,7 +22,7 @@ public class TurretSubsystem {
 
     public enum State {AUTO, IDLE, MANUAL}
 
-    private final CRServo turntableServo;
+    private final DcMotor turntableMotor;
     private final int horizontalTolerance = 10;
     private final int verticalTolerance = 10;
 
@@ -40,18 +39,15 @@ public class TurretSubsystem {
     private boolean busy = false;
 
     public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        turntableServo = hardwareMap.get(CRServo.class, "turntableServo");
-
+        turntableMotor = hardwareMap.get(DcMotor.class, "turntableMotor");
 
         // Set directions (adjust if movement is inverted) ----------
-        turntableServo.setDirection(CRServo.Direction.FORWARD);
-
-
+        turntableMotor.setDirection(DcMotor.Direction.REVERSE);
       }
     // Manual Aiming
     public void manualAiming(double horizontal){
-        double turnPower = horizontal * speed;
-        turntableServo.setPower(turnPower);
+        turnPower = horizontal * speed;
+        turntableMotor.setPower(turnPower);
     }
     
     // Look For Game Objects
@@ -68,7 +64,7 @@ public class TurretSubsystem {
     public void addTelemetry (Telemetry telemetry){
         telemetry.addLine("----- Turret -----");
         telemetry.addData("Turret State = ", state);
-        telemetry.addData("Turret Horizontal Power = ", turntableServo.getPower());
+        telemetry.addData("Turret Horizontal Power = ", turntableMotor.getPower());
 
 
     }

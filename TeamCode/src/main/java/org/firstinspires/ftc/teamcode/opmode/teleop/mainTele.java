@@ -25,6 +25,8 @@ public class mainTele extends LinearOpMode {
         telemetry.addLine("Ready to drive!");
 
         robot = new Robot(hardwareMap, telemetry);
+        robot.shooter.angleUp();
+        robot.shooter.angleDown();
 
 
         waitForStart();
@@ -45,15 +47,18 @@ public class mainTele extends LinearOpMode {
                 robot.drive.toggleSlowMode();
             }
 
-            // Lift Ball -----------------------------------------------------------------
-            if (gamepad2.x && !XPressedLast) {
-                robot.shooter.liftBall();
-            }
+
 
             // Turn Turret ---------------------------------------------------------------
             robot.turret.manualAiming(horizontal);
             // Change Launch Angle -------------------------------------------------------
-            robot.shooter.manualAngling(vertical);
+            if (gamepad2.dpad_up) {
+                robot.shooter.angleUp();
+            }
+            if (gamepad2.dpad_down) {
+                robot.shooter.angleDown();
+            }
+
             // Initiate a short shot -----------------------------------------------------
             if (gamepad2.y && !YPressedLast) {
                     robot.shooter.startShot(1, "short");
@@ -63,23 +68,24 @@ public class mainTele extends LinearOpMode {
             if (gamepad2.a && !APressedLast) {
                     robot.shooter.startShot(1, "long");
             }
+
             // Manually control the intakes -----------------------------------------------
             if (!robot.shooter.isBusy()) {
                 // Control the first intake
                 if (gamepad2.left_bumper)  {
-                    robot.shooter.startIntake();
+                    robot.shooter.startIntake(1);
+                }
+                else if (gamepad2.right_bumper) {
+                    robot.shooter.startIntake(0);
                 } else {
                     robot.shooter.stopIntake();
                 }
-                if (gamepad2.dpad_up) {
-                    robot.shooter.liftBall();
-                }
                 
-                // Control the second intake ----------------------------------------------
+                // Control Outtake ----------------------------------------------
                 if (gamepad2.right_trigger > 0) {
                     //telemetry.addLine("Velocity= " + launcher.getVelocity());
                     robot.shooter.startOuttake();
-                } else {
+                } else if (!gamepad2.left_bumper) {
                     robot.shooter.stopOuttake();
                 }
             }
