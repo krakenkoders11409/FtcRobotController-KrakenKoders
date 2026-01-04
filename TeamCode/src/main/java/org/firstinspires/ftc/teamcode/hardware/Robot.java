@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.hardware;
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -62,5 +61,6 @@ public class Robot {
         // Read Vision output
         double headingDeg = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         vision.updateRobotOrientation(headingDeg);
+
     }
 }

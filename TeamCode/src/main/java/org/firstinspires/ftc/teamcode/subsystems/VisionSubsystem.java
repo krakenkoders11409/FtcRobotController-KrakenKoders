@@ -45,10 +45,7 @@ public class VisionSubsystem {
     public void setPipeline(int index) {
         limelight.pipelineSwitch(index);
     }
-    /**
-     * Simple steering correction value you can feed into your drive turn value.
-     * Tunable proportional gain (kP).
-     */
+
     public double getSteeringCorrection() {
         if (!hasTarget) return 0.0;
 
@@ -80,6 +77,15 @@ public class VisionSubsystem {
     public boolean hasFieldPose() {
         return hasFieldPose;
     }
+
+    // --- Target Data Functions ---
+    public boolean hasTarget() {
+        return hasTarget;
+    }
+    public double getTx() {
+        return tx;
+    }
+
 
 
 
