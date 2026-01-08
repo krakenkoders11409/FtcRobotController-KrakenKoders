@@ -72,13 +72,14 @@ public class ShooterSubsystem {
     public void startShot(int shots, String type) {
         if (busy) return;
 
-        numberOfShots = Math.max(0, shots);
-        shotType = type == null ? "" : type;
+        numberOfShots = shots;
+        shotType = type;
         busy = true;
-        // begin by priming intake
+
+        intake.setPower(-0.5);
         enterState(State.PRIME_INTAKE);
-        intake.setPower(-0.5); // prime direction as before
     }
+
 
     /** Call this every loop to advance the sequence without blocking. */
     public void update() {
@@ -91,26 +92,20 @@ public class ShooterSubsystem {
                 outtakeMotor.setPower(0);
                 break;
 
-
             case PRIME_INTAKE:
-                // intake reverse to seat ball
                 intake.setPower(-0.5);
                 if (timer.milliseconds() >= primeIntakeMs) {
                     intake.setPower(0);
+                    outtakeMotor.setPower(-0.2);   // gentle reverse bump
                     enterState(State.PRIME_OUTTAKE);
-                    // start bumping shooter backward
-                    outtakeMotor.setPower(-0.5);
                 }
                 break;
 
-
             case PRIME_OUTTAKE:
-                // brief backward bump of shooter flywheel
-                if (timer.milliseconds() >= 400) {  // 300ms is typical; adjust as needed
+                if (timer.milliseconds() >= 300) {
                     outtakeMotor.setPower(0);
                     enterState(State.SPIN_UP);
 
-                    // now start spinning up
                     if (Objects.equals(shotType, "short")) {
                         outtakeMotor.setVelocity(shortShotVelocity);
                     } else {
@@ -119,7 +114,6 @@ public class ShooterSubsystem {
                 }
                 break;
 
-
             case SPIN_UP:
                 int targetVel = Objects.equals(shotType, "short")
                         ? shortShotVelocity
@@ -127,31 +121,28 @@ public class ShooterSubsystem {
 
                 double error = Math.abs(lastVelocity - targetVel);
 
-                if (error <= velocityTolerance || timer.milliseconds() >= spinUpMs) {
-                    enterState(State.FIRE_BALLS);
+                if (error <= velocityTolerance ||
+                        timer.milliseconds() >= spinUpMs) {
+
                     intake.setPower(1.0);
+                    enterState(State.FIRE_BALLS);
                 }
                 break;
 
-
             case FIRE_BALLS:
                 if (timer.milliseconds() >= feedMs) {
-                    // one ball completed
                     intake.setPower(0);
                     numberOfShots--;
 
                     if (numberOfShots <= 0) {
-                        // done shooting
                         outtakeMotor.setVelocity(0);
                         enterState(State.SPIN_DOWN_ALL);
                     } else {
-                        // fire next ball
                         timer.reset();
                         intake.setPower(1.0);
                     }
                 }
                 break;
-
 
             case SPIN_DOWN_ALL:
                 if (timer.milliseconds() >= spinDownMs) {
@@ -161,6 +152,7 @@ public class ShooterSubsystem {
                 break;
         }
     }
+
 
 
     /** Eject a number of balls (immediate fire with eject velocity). */
@@ -236,5 +228,6 @@ public class ShooterSubsystem {
     }
 
     public boolean isBusy() { return busy; }
+    public boolean isNotBusy() { return !busy; }
     public State getState() { return state; }
 }
