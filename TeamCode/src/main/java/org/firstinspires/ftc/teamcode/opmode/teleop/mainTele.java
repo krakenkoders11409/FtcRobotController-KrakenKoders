@@ -72,7 +72,10 @@ public class mainTele extends LinearOpMode {
 
             robot.shooter.manualAngling(gamepad2.left_stick_y);
 
-
+            // --- Load Shot ---
+            if (gamepad2.right_bumper && !BPressedLast) {
+                robot.shooter.eject();
+            }
             // --- Initiate a short shot ---
             if (gamepad2.y && !YPressedLast) {
                     robot.shooter.startShot(1, "short");
