@@ -21,6 +21,13 @@ public class mainTele extends LinearOpMode {
     boolean XPressedLast = false;
     boolean YPressedLast = false;
 
+    boolean DPadLeftPressedLast = false;
+    boolean DPadRightPressedLast = false;
+    boolean DPadUpPressedLast = false;
+    boolean DPadDownPressedLast = false;
+
+
+
 
     //@Override
     public void runOpMode() throws InterruptedException {
@@ -60,11 +67,24 @@ public class mainTele extends LinearOpMode {
                 robot.turret.enableAutoAim();
             }
 
+            if(gamepad2.dpad_left && !DPadLeftPressedLast) {
+                robot.vision.clearAllowedTags();
+                robot.vision.addAllowedTag(20);
+            }
+            if(gamepad2.dpad_right && !DPadRightPressedLast) {
+                robot.vision.clearAllowedTags();
+                robot.vision.addAllowedTag(24);
+            }
+
+
+
 
             // --- Turret Control ---
             robot.turret.manualAiming(-gamepad2.right_stick_x);
             robot.turret.autoAim(robot.vision.getTx(), robot.vision.hasTarget());
-            robot.turret.update(horizontal, robot.vision.getTx(), robot.vision.hasTarget());
+            robot.turret.setTxOffset(1);
+            robot.turret.update(-gamepad2.right_stick_x, robot.vision.getTx(), robot.vision.hasTarget());
+
 
             if (gamepad2.x && !XPressedLast) {
                 robot.turret.toggleAutoAim();

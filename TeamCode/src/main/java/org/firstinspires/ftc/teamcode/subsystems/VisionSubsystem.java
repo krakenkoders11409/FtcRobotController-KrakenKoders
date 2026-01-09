@@ -7,6 +7,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class VisionSubsystem {
     private final Limelight3A limelight;
@@ -14,6 +17,7 @@ public class VisionSubsystem {
     // Raw Limelight values
     public boolean hasTarget = false;
     public boolean hasFieldPose = false;
+    private final Set<Integer> allowedTags = new HashSet<>();
 
 
     // Tag offsets
@@ -69,6 +73,18 @@ public class VisionSubsystem {
         return correction;
     }
 
+    // --- April Tag offset ---
+    private double turretTxOffsetDeg = 0.0;
+
+    public void setTurretTxOffset(double offsetDeg) {
+        turretTxOffsetDeg = offsetDeg;
+    }
+
+    public double getCorrectedTx() {
+        return tx + turretTxOffsetDeg;
+    }
+
+
     // --- Field Data ---
     public void updateRobotOrientation(double robotHeadingDeg) {
         robotYawDeg = robotHeadingDeg;
@@ -111,6 +127,23 @@ public class VisionSubsystem {
         return tagDistanceMeters;
     }
 
+    // Tags allowed
+    // Add a tag ID to the whitelist
+    public void addAllowedTag(int tagId) {
+        allowedTags.add(tagId);
+    }
+
+    // Remove a tag ID from the whitelist
+    public void removeAllowedTag(int tagId) {
+        allowedTags.remove(tagId);
+    }
+
+    // Clear the whitelist
+    public void clearAllowedTags() {
+        allowedTags.clear();
+    }
+
+
 
     public void update() {
         LLResult result = limelight.getLatestResult();
@@ -125,38 +158,49 @@ public class VisionSubsystem {
             return;
         }
 
-        hasTarget = true;
+        // Fiducials
+        fiducialCount = result.getFiducialResults() != null ? result.getFiducialResults().size() : 0;
 
-        // 2D offsets
-        tx = result.getTx();
-        ty = result.getTy();
-        ta = result.getTa();
+        // --- Select first allowed tag ---
+        LLResultTypes.FiducialResult selectedTag = null;
+        if (result.getFiducialResults() != null) {
+            for (LLResultTypes.FiducialResult fid : result.getFiducialResults()) {
+                // Empty whitelist = allow all tags
+                if (allowedTags.isEmpty() || allowedTags.contains(fid.getFiducialId())) {
+                    selectedTag = fid;
+                    break; // stop at first allowed tag
+                }
+            }
+        }
 
-        // Distance to April Tag (from fiducial results)
-        if (result.getFiducialResults() != null && !result.getFiducialResults().isEmpty()) {
-            fiducialCount = result.getFiducialResults().size();
+        if (selectedTag != null) {
+            hasTarget = true;
 
-            LLResultTypes.FiducialResult tag = result.getFiducialResults().get(0);
-            Pose3D camToTag = tag.getCameraPoseTargetSpace();
-
+            Pose3D camToTag = selectedTag.getCameraPoseTargetSpace();
             if (camToTag != null) {
                 double x = camToTag.getPosition().x;
                 double y = camToTag.getPosition().y;
                 double z = camToTag.getPosition().z;
 
-                // True straight-line distance (meters)
                 tagDistanceMeters = Math.sqrt(x * x + y * y + z * z);
-
-                // Absolute forward component (useful if z is forward/back)
                 tagForwardMeters = Math.abs(z);
             } else {
                 tagDistanceMeters = -1.0;
                 tagForwardMeters = -1.0;
             }
+
+            // 2D offsets from limelight
+            tx = result.getTx();
+            ty = result.getTy();
+            ta = result.getTa();
         } else {
-            fiducialCount = 0;
+            // No allowed tag detected
+            hasTarget = false;
             tagDistanceMeters = -1.0;
             tagForwardMeters = -1.0;
+            tx = 0;
+            ty = 0;
+            ta = 0;
         }
 
         // ---- 3D robot pose from AprilTags ----
@@ -167,7 +211,6 @@ public class VisionSubsystem {
             fieldY = botposeMT2.getPosition().y;
             fieldYaw = botposeMT2.getOrientation().getYaw(AngleUnit.DEGREES);
         } else {
-            // Fall back to basic botpose if MT2 is unavailable
             Pose3D botpose = result.getBotpose();
             if (botpose != null) {
                 hasFieldPose = true;
@@ -179,6 +222,7 @@ public class VisionSubsystem {
             }
         }
     }
+
 
 
     private static final double METERS_TO_FEET = 3.28084;

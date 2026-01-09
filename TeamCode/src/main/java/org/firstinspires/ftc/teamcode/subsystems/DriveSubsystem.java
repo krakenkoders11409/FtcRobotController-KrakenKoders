@@ -75,6 +75,10 @@ public class DriveSubsystem {
         frontRightMotor.setPower(0);
         backRightMotor.setPower(0);
     }
+    public boolean isBusy() {
+        return frontLeftMotor.isBusy() || backLeftMotor.isBusy() ||
+                frontRightMotor.isBusy() || backRightMotor.isBusy();
+    }
 
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addLine("----- Motors -----");

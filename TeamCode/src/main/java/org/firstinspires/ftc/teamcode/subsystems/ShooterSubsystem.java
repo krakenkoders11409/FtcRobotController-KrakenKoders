@@ -30,9 +30,9 @@ public class ShooterSubsystem {
     private final Servo leftVerticalServo;
 
     // Tunables
-    private final int shortShotVelocity = 1400; // spin power
-    private final int longShotVelocity = 2000; // spin power
-    private final int ejectVelocity = 1000;
+    private final int shortShotVelocity = 900; // spin power
+    private final int longShotVelocity = 1200; // spin power
+    private final int ejectVelocity = 500;
     private final double targetPower = 1.0; // spin power
     private final double intakePower = 1.0; // spin power
     private final long spinUpMs = 2000; // wait time before feed
