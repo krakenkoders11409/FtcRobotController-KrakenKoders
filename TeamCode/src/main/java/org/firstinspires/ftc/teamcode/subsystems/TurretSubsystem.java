@@ -17,8 +17,8 @@ public class TurretSubsystem {
     double turnPower = 0;
 
     // Limelight aiming constants --------------------------------------------------------
-    private static final double TURRET_KP = 0.015; // tune on field
-    private static final double MAX_AUTO_POWER = 0.25;
+    private static final double TURRET_KP = 0.06; // tune on field orig 0.015
+    private static final double MAX_AUTO_POWER = 1;
     private static final double TX_DEADBAND = 1.0; // degrees
 
     // Aiming ------------------------------------------------------------------------------
@@ -85,6 +85,21 @@ public class TurretSubsystem {
 
 
     // Manual Aiming
+    public void turretRunToPosition(int targetTicks) {
+        if (state == State.MANUAL) {
+            return; // do not override manual control
+        }
+
+        // Set the target
+        turntableMotor.setTargetPosition(targetTicks);
+
+        // Switch mode
+        turntableMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Apply power (FTC SDK requires power > 0 to move)
+        turntableMotor.setPower(0.5); // adjust speed as needed
+    }
+
     public void manualAiming(double horizontal) {
 
         // Deadzone
@@ -140,13 +155,12 @@ public class TurretSubsystem {
             return;
         }
 
-        double power = tx * TURRET_KP;
+        double power = tx * (TURRET_KP * -1);
         power = Math.max(-MAX_AUTO_POWER, Math.min(MAX_AUTO_POWER, power));
 
         int currentPos = turntableMotor.getCurrentPosition();
 
-        if ((currentPos <= TURRET_MIN_TICKS && power < 0) ||
-                (currentPos >= TURRET_MAX_TICKS && power > 0)) {
+        if ((currentPos <= TURRET_MIN_TICKS && power < 0) || (currentPos >= TURRET_MAX_TICKS && power > 0)) {
             turntableMotor.setPower(0);
         } else {
             turntableMotor.setPower(power);

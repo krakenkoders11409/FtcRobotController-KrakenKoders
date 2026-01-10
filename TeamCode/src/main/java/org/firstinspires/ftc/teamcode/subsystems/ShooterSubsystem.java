@@ -30,13 +30,13 @@ public class ShooterSubsystem {
     private final Servo leftVerticalServo;
 
     // Tunables
-    private final int shortShotVelocity = 900; // spin power
-    private final int longShotVelocity = 1200; // spin power
+    private final int shortShotVelocity = 950; // spin power
+    private final int longShotVelocity = 1250; // spin power
     private final int ejectVelocity = 500;
     private final double targetPower = 1.0; // spin power
     private final double intakePower = 1.0; // spin power
     private final long spinUpMs = 2000; // wait time before feed
-    private final long feedMs = 1000; // time to press the ball
+    private final long feedMs = 2000; // time to press the ball
     private final long spinDownMs = 1000; // optional coast-down window
     private final int velocityTolerance = 35; // how far away from the target velocity is OK
     private String shotType = "";
@@ -51,6 +51,15 @@ public class ShooterSubsystem {
     private int numberOfShots = 0;
     private int numberOfBalls = 0;
     private double lastVelocity = 0;
+
+    // --- Dynamic Shot Power ---
+//    public static double shotSpeed(double distance){
+//        return MathFunctions
+//    }
+//
+//    public static double hoodAngle(double distance){
+//        return MathFunctions
+//    }
 
 
     public ShooterSubsystem(HardwareMap hardwareMap) {
