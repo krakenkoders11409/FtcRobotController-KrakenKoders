@@ -226,6 +226,9 @@ public class ShooterSubsystem {
 
         leftVerticalServo.setPosition(anglePos);
     }
+    public void hoodAngle(double position) {
+        leftVerticalServo.setPosition(position);
+    }
 
 
     public void angleUp() {

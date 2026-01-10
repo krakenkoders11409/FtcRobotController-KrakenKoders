@@ -19,6 +19,8 @@ public class testAuto extends LinearOpMode {
 
         // --- Set up wheels ---
         robot.drive.resetEncoders();
+        robot.shooter.angleUp();
+        robot.shooter.angleDown();
 
         // --- Set up vision / turret ---
         // Set turret TX offset to +10 degrees <- Left (adjust if your sign convention differs)
@@ -45,7 +47,7 @@ public class testAuto extends LinearOpMode {
         AutoStep autoStep = AutoStep.POSITION;
 
         // safety timeout values (adjust as needed)
-        final double SHOOT_TIMEOUT_S = 7;    // max seconds to wait for shooter
+        final double SHOOT_TIMEOUT_S = 4;    // max seconds to wait for shooter
         final double AIM_TOLERANCE_DEG = 5.0;  // aim tolerance in degrees
 
         while (opModeIsActive() && autoStep != AutoStep.DONE) {
@@ -107,9 +109,7 @@ public class testAuto extends LinearOpMode {
                     if (!robot.shooter.isBusy()) {
                         // advance to driving
                         timer.reset();
-                        autoStep = AutoStep.DONE;
-
-                        if (timer.seconds() > 7) {
+                        if (timer.seconds() > 4) {
                             autoStep = AutoStep.DRIVE;
                             robot.drive.resetEncoders();
                             robot.drive.setTargetForwardInches(10, 0.8);
