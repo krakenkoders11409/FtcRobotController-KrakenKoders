@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import static org.firstinspires.ftc.teamcode.constants.DriveConstants.DriveConstants.TICKS_PER_INCH;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -117,6 +118,19 @@ public class DriveSubsystem {
     }
 
     public void setTargetDrive(double forwardInches, double strafeInches, double rotateDegrees, double power) {
+        if (power > 0) {
+            frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+            backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+            frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+            backRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        } else {
+            frontLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+            backLeftMotor.setDirection(DcMotor.Direction.FORWARD);
+            frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+            backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        }
+
+
         resetEncoders();
         int forwardTicks = (int) Math.round(forwardInches * TICKS_PER_INCH);
         int strafeTicks  = (int) Math.round(strafeInches  * TICKS_PER_INCH);

@@ -281,7 +281,7 @@ public class ShooterSubsystem {
 
     public void addTelemetry(Telemetry telemetry) {
         telemetry.addLine("----- Shooter -----");
-        telemetry.addData("Shooter Velocity = ", lastVelocity);
+        telemetry.addData("Shooter Velocity = ", getOuttakeVelocity());
         telemetry.addData("Vertical Aim Pos", anglePos);
 
     }
