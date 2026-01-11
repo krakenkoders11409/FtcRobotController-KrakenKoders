@@ -43,7 +43,6 @@ public class mainTele extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            robot.update();
 
             // Read joystick Values  for Gamepad 1 --------------------------------------
             double forward = -gamepad1.left_stick_y; // Forward is negative on the stick

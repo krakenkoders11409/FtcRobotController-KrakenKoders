@@ -45,6 +45,13 @@ public class Tuning extends LinearOpMode {
         while (opModeIsActive()) {
             robot.update();
 
+            double forward = -gamepad1.left_stick_y; // Forward is negative on the stick
+            double strafe = gamepad1.left_stick_x;  // Strafe
+            double turn = gamepad1.right_stick_x; // Rotation
+            // Read Joystick Values for Gamepad 2 ---------------------------------------
+            double horizontal = -gamepad2.right_stick_x;
+            double vertical = -gamepad2.left_stick_y;
+
             robot.shooter.manualAngling(gamepad2.left_stick_y);
 
             boolean dpadUp = gamepad2.dpad_up;
@@ -83,7 +90,7 @@ public class Tuning extends LinearOpMode {
                 } else {
                     robot.shooter.stopIntake();
                 }
-
+                robot.drive.drive(forward, strafe, turn);
 // Telemetry
                 telemetry.addData("Flywheel Velocity", flywheelVelocity);
                 robot.addTelemetry(telemetry);

@@ -129,7 +129,7 @@ public class ShooterSubsystem {
                 lastVelocity = outtakeMotor.getVelocity();
                 if ("short".equals(shotType)) {
                     if (Math.abs(shortShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                    //if (timer.milliseconds() >= spinUpMs) {
+                        //if (timer.milliseconds() >= spinUpMs) {
                         state = State.FEED;
                         timer.reset();
                         unBlockIntake();
@@ -137,7 +137,7 @@ public class ShooterSubsystem {
                     }
                 } else {
                     if (Math.abs(longShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                    //if (timer.milliseconds() >= spinUpMs) {
+                        //if (timer.milliseconds() >= spinUpMs) {
                         state = State.FEED;
                         timer.reset();
                         blockIntake();
@@ -145,13 +145,13 @@ public class ShooterSubsystem {
 
                     }
                 }
-                
+
                 break;
 
             case EJECT:
                 lastVelocity=  outtakeMotor.getVelocity();
                 if (Math.abs(ejectVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                // if (timer.milliseconds() >= spinUpMs) {
+                    // if (timer.milliseconds() >= spinUpMs) {
                     state = State.FEED;
                     timer.reset();
                     intake.setPower(intakePower); // push ball into shooter
@@ -172,7 +172,7 @@ public class ShooterSubsystem {
                 if (numberOfShots > 1){
                     state = State.SPIN_UP;
                     if (shotType == "short") {
-                    outtakeMotor.setVelocity(shortShotVelocity);
+                        outtakeMotor.setVelocity(shortShotVelocity);
                     } else {
                         outtakeMotor.setVelocity(longShotVelocity);
                     }
@@ -186,9 +186,9 @@ public class ShooterSubsystem {
                 break;
         }
     }
-    
+
     public void eject(int balls) {
-        if(busy) { 
+        if(busy) {
             //telemetry.addLine("Shooter is busy");
             return; // ignore if already running
         }
@@ -291,4 +291,3 @@ public class ShooterSubsystem {
 
 
 }
-    
