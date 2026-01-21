@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.hardware;
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -48,18 +47,20 @@ public class Robot {
     public void addTelemetry(Telemetry telemetry) {
         drive.addTelemetry(telemetry);
         shooter.addTelemetry(telemetry);
+        turret.addTelemetry(telemetry);
         vision.addTelemetry(telemetry);
     }
 
     /** Called every control loop — optional, but great practice */
-    public void UpdatePeriodic() {
+    public void update() {
         // --- Update Subsystems
-        drive.periodic();
+        drive.update();
         shooter.update();
-        vision.periodic();
+        vision.update();
 
         // Read Vision output
         double headingDeg = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         vision.updateRobotOrientation(headingDeg);
+
     }
 }
