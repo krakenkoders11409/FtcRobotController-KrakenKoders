@@ -4,10 +4,18 @@ import static org.firstinspires.ftc.teamcode.constants.DriveConstants.DriveConst
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class DriveSubsystem {
+
+    //IMU ----------------------------
+    private IMU imu;
+
+
 
     private final DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     private double speedMultiplier = 1.0;
@@ -41,7 +49,45 @@ public class DriveSubsystem {
         frontRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //IMU -------------------------------------------------------------------------
+        imu = hardwareMap.get(IMU.class, "imu");
+
+        IMU.Parameters parameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+                )
+        );
+        imu.initialize(parameters);
+        // --------------------------------------------------------------------------
     }
+
+    // Everything With IMU ----------------------------------------------------------------------
+
+        //Gets rotation of robot
+    public double getHeadingRadians() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+    }
+
+        //Resets all axis (add to start or auto if needed)
+    public void resetHeading() {
+        imu.resetYaw();
+    }
+
+        //Main system
+    public void driveFieldOriented(double forward, double strafe, double turn) {
+
+        double heading = getHeadingRadians();
+
+        // Rotate joystick input to cancel robot heading
+        double rotStrafe = strafe * Math.cos(heading) - forward * Math.sin(heading);
+        double rotForward = strafe * Math.sin(heading) + forward * Math.cos(heading);
+
+        // Reuse your existing mecanum math
+        drive(rotForward, rotStrafe, turn);
+    }
+    // -------------------------------------------------------------------------------------------
 
     public void drive(double forward, double strafe, double turn) {
 

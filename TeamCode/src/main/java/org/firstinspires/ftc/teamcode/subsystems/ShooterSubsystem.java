@@ -32,8 +32,8 @@ public class ShooterSubsystem {
     private final CRServo  leftVerticalServo, rightVerticalServo;
 
     // Tunables
-    private final int shortShotVelocity = 1400; // spin power
-    private final int longShotVelocity = 2000; // spin power
+    private final int shortShotVelocity = 900; // spin power
+    private final int longShotVelocity = 1400; // spin power
     private final int ejectVelocity = 1000;
     private final double targetPower = 1.0; // spin power
     private final double intakePower = 1.0; // spin power

@@ -84,7 +84,8 @@ public class mainTele extends LinearOpMode {
                 }
             }
 
-            robot.drive.drive(forward, strafe, turn);
+            //robot.drive.drive(forward, strafe, turn);
+            robot.drive.driveFieldOriented(forward, strafe, turn);
 
             // Loop updates
             robot.UpdatePeriodic();
