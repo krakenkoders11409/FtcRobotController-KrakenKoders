@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 
-@Autonomous(name = "shortRed", group = "short")
-public class shortRed extends LinearOpMode {
+@Autonomous(name = "longBlueSENSORYOVERLOAD", group = "SENSORYOVERLOAD")
+public class longBlueSENSORYOVERLOAD extends LinearOpMode {
     private enum AutoStep { POSITION, AIM, SHOOT, DRIVE, ROTATE, GRAB, BACK_UP, ROTATE_BACK, DONE }
 
     @Override
@@ -25,12 +25,16 @@ public class shortRed extends LinearOpMode {
         // --- Set up hood ---
         robot.shooter.angleUp();
         robot.shooter.angleDown();
+
+        robot.shooter.angleUp();
+        robot.shooter.angleUp();
+        robot.shooter.angleUp();
         robot.shooter.angleUp();
 
 
         // --- Set up vision / turret ---
         // Set turret TX offset to +10 degrees <- Left (adjust if your sign convention differs)
-        robot.turret.setTxOffset(0);
+        robot.turret.setTxOffset(2);
         robot.turret.setTurretKP(0.03);
 
         // Prefer explicit enable if available. If not, toggle is a fallback.
@@ -43,7 +47,7 @@ public class shortRed extends LinearOpMode {
         }
 
         robot.vision.clearAllowedTags();
-        robot.vision.addAllowedTag(24);
+        robot.vision.addAllowedTag(20);
 
         // Timer for sequential actions and timeouts
         ElapsedTime timer = new ElapsedTime();
@@ -53,7 +57,7 @@ public class shortRed extends LinearOpMode {
         AutoStep autoStep = AutoStep.POSITION;
 
         // safety timeout values (adjust as needed)
-        final double SHOOT_TIMEOUT_S = 3;    // max seconds to wait for shooter
+        final double SHOOT_TIMEOUT_S = 4;    // max seconds to wait for shooter
         final double AIM_TOLERANCE_DEG = 5.0;  // aim tolerance in degrees
         boolean rotate = false;
 
@@ -83,15 +87,13 @@ public class shortRed extends LinearOpMode {
             telemetry.addData("Rotate", rotate);
 
 
-
             switch (autoStep) {
                 case POSITION:
                     robot.drive.resetEncoders();
-                    robot.drive.setTargetDrive(55, 0, 0, -0.4);
+                    robot.drive.setTargetDrive(2, 0, 0, 0.4);
                     robot.drive.setRunToPositionMode();
                     timer.reset();
                     autoStep = AutoStep.AIM;
-
 
 
                 case AIM:
@@ -103,7 +105,7 @@ public class shortRed extends LinearOpMode {
                             if (timer.seconds() > 1) {
                                 // Start shooting sequence
                                 autoStep = AutoStep.SHOOT;
-                                robot.shooter.startShot(1, "short");
+                                robot.shooter.startShot(1, "autoLong");
                                 timer.reset(); // begin shooter timeout
                             }
                         }
@@ -114,98 +116,62 @@ public class shortRed extends LinearOpMode {
                     break;
 
                 case SHOOT:
-                    // advance to driving
-                    timer.reset();
-                    if (timer.seconds() > 3) {
-                        autoStep = AutoStep.DRIVE;
-                        robot.drive.resetEncoders();
-                        robot.drive.setTargetDrive(0, -10, 0, 0.8);
-                        robot.drive.setRunToPositionMode();
-                        autoStep = AutoStep.DRIVE;
-            } else if (timer.seconds() > SHOOT_TIMEOUT_S) {
-                // shooter stuck — bail out to next step to avoid stall
-                telemetry.addData("WARN", "Shooter timeout, continuing.");
-                robot.drive.resetEncoders();
-                robot.drive.setTargetDrive(0, -10, 0, 0.5);
-                robot.drive.setRunToPositionMode();
-                timer.reset();
-                autoStep = AutoStep.DRIVE;
-
-            }
-            break;
-
-            case DRIVE:
-                if (timer.seconds() > 2) {
-                    robot.drive.resetEncoders();
-                    robot.drive.setTargetDrive(0, 0, 0, 0);
-                    robot.drive.setRunToPositionMode();
-                    autoStep = AutoStep.DONE;
-//                        telemetry.addLine("Rotation");
-//                        robot.drive.setTargetDrive(0, 0, 90, 0.5);
-//                        rotate = true;
-//                        robot.drive.setRunToPositionMode();
-//                        autoStep = AutoStep.ROTATE;
-//                        timer.reset();
-                }
-                break;
-
-                case ROTATE:
-                    if(timer.seconds() > 2) {
-                        robot.shooter.startIntake(1);
-                        robot.shooter.startOuttake(-0.5);
-                        robot.drive.setTargetDrive(45, 0, 0, 0.07);
-                        robot.drive.setRunToPositionMode();
-                        autoStep = AutoStep.GRAB;
+                    // Proceed when shooter finished OR when timeout elapsed
+                    if (!robot.shooter.isBusy()) {
+                        // advance to driving
                         timer.reset();
-                    }
-                    break;
-
-                case GRAB:
-                    if(timer.seconds() > 7) {
-                        robot.shooter.stopIntake();
-                        robot.shooter.stopOuttake();
-                        robot.drive.setTargetDrive(-40, 0, 0, 0.5);
-                        robot.drive.setRunToPositionMode();
-                        timer.reset();
-                        autoStep = AutoStep.BACK_UP;
-                    }
-                    break;
-
-                case BACK_UP:
-
-                    if(timer.seconds() > 1) {
-                        robot.drive.setTargetDrive(0, 0, 70, -0.5);
-                        timer.reset();
-                        if (timer.seconds() > 3) {
-                            robot.drive.setTargetDrive(-20, 0, 0, 0.5);
-                            robot.shooter.startShot(1, "autoLong");
-                            autoStep = AutoStep.BACK_UP;
-                            timer.reset();
+                        if (timer.seconds() > 2) {
+                            autoStep = AutoStep.DRIVE;
+                            robot.drive.resetEncoders();
+                            robot.drive.setTargetDrive(0, 0, -90, 0.8);
+                            robot.drive.setRunToPositionMode();
+                            autoStep = AutoStep.DRIVE;
                         }
 
+                    } else if (timer.seconds() > SHOOT_TIMEOUT_S) {
+                        // shooter stuck — bail out to next step to avoid stall
+                        telemetry.addData("WARN", "Shooter timeout, continuing.");
+                        robot.drive.resetEncoders();
+                        robot.drive.setTargetDrive(0, 0, -90, 0.8);
+                        robot.drive.setRunToPositionMode();
+                        timer.reset();
+                        autoStep = AutoStep.DRIVE;
 
+                    }
+                    break;
+
+                case DRIVE:
+                    if (timer.seconds() > 4) {
+                        telemetry.addLine("Rotation");
+                        robot.drive.setTargetDrive(45, 0, 0, 0.1);
+                        rotate = true;
+                        robot.drive.setRunToPositionMode();
+                        autoStep = AutoStep.ROTATE;
+                        timer.reset();
+                        }
+                    break;
+
+                case ROTATE:
+                    if(timer.seconds() > 8) {
                         if (!robot.drive.isBusy()) {
                             autoStep = AutoStep.DONE;
                         }
                     }
-                        break;
+                    break;
 
 
-
-
-
-                        case DONE:
-                            // Optionally stop motors or set a safe state
-                            break;
-                    }
-
-                    telemetry.update();
-                    // allow other threads / hardware to run
-                    idle();
+                case DONE:
+                    // Optionally stop motors or set a safe state
+                    break;
             }
 
-            // cleanup / final telemetry
-            telemetry.addData("Auto", "Finished");
             telemetry.update();
+            // allow other threads / hardware to run
+            idle();
         }
+
+        // cleanup / final telemetry
+        telemetry.addData("Auto", "Finished");
+        telemetry.update();
     }
+}

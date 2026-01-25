@@ -1,12 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
-
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.constants.DriveConstants.DriveConstants.TICKS_PER_INCH;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class DriveSubsystem {
@@ -31,7 +26,7 @@ public class DriveSubsystem {
         // Set motor directions (adjust if movement is inverted) ----------
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
         backRightMotor.setDirection(DcMotor.Direction.FORWARD);
 
         // Set motor behavior ----------------------------------------------
