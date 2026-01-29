@@ -69,7 +69,7 @@ public class TurretSubsystem {
         turntableMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turntableMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Set directions (adjust if movement is inverted) ----------
+        // Set directions (adjust if movement is inverted) ------------------
         turntableMotor.setDirection(DcMotor.Direction.FORWARD);
       }
 

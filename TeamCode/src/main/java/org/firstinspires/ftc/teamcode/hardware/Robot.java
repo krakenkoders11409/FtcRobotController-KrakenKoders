@@ -25,42 +25,42 @@ public class Robot {
         // Initialize all subsystems in a controlled, predictable order
 
         // --- Subsystems ---
-        turret = new TurretSubsystem(hardwareMap, telemetry);
+//        turret = new TurretSubsystem(hardwareMap, telemetry);
         drive = new DriveSubsystem(hardwareMap);
-        shooter = new ShooterSubsystem(hardwareMap);
-        vision = new VisionSubsystem(hardwareMap);
+//        shooter = new ShooterSubsystem(hardwareMap);
+//        vision = new VisionSubsystem(hardwareMap);
         imu = hardwareMap.get(IMU.class, "imu");
         //intake = new IntakeSubsystem(hardwareMap);
 
         // --- Vision Hardware ---
-        IMU.Parameters parameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-                )
-        );
-
-        imu.initialize(parameters);
-        imu.resetYaw();
+//        IMU.Parameters parameters = new IMU.Parameters(
+//                new RevHubOrientationOnRobot(
+//                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+//                        RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
+//                )
+//        );
+//
+//        imu.initialize(parameters);
+//        imu.resetYaw();
     }
 
     public void addTelemetry(Telemetry telemetry) {
         drive.addTelemetry(telemetry);
-        shooter.addTelemetry(telemetry);
-        turret.addTelemetry(telemetry);
-        vision.addTelemetry(telemetry);
+//        shooter.addTelemetry(telemetry);
+//        turret.addTelemetry(telemetry);
+//        vision.addTelemetry(telemetry);
     }
 
     /** Called every control loop — optional, but great practice */
     public void update() {
         // --- Update Subsystems
         drive.update();
-        shooter.update();
-        vision.update();
+//        shooter.update();
+//        vision.update();
 
         // Read Vision output
         double headingDeg = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        vision.updateRobotOrientation(headingDeg);
+//        vision.updateRobotOrientation(headingDeg);
 
     }
 }
