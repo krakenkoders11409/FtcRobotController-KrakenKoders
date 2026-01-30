@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -78,8 +79,8 @@ public class ShooterSubsystem {
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         // Set motor directions (adjust if movement is inverted) ----------
-        outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
-        intake.setDirection(DcMotor.Direction.REVERSE);
+        outtakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        intake.setDirection(DcMotor.Direction.FORWARD);
         intakeBlockServo.setDirection(Servo.Direction.REVERSE);
         leftVerticalServo.setDirection(Servo.Direction.REVERSE);
 
