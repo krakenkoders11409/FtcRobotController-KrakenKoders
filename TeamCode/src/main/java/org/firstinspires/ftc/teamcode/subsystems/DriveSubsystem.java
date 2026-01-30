@@ -47,7 +47,7 @@ public class DriveSubsystem {
         odoForwardWheel = hardwareMap.get(DcMotor.class, "odoForwardWheel");
         odoStrafeWheel = hardwareMap.get(DcMotor.class, "odoStrafeWheel");
 
-        // Set motor directions (adjust if movement is inverted) ----------
+        // Set motor directions (adjust if movement is inverted) ---------- TODO Check if they are right for Macanum Drive
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
@@ -102,7 +102,7 @@ public class DriveSubsystem {
         yPos += fieldDeltaY;
     }
 
-
+    //TODO: Lucas, I think something with this is messing with the strafe, otherwise I will try to fix reverse
     // Field Oriented Drive -----------------------------------------------------------------------
     public void driveFieldOriented(double forward, double strafe, double turn){
         double rotStrafe = strafe * Math.cos(heading) - forward * Math.sin(heading);

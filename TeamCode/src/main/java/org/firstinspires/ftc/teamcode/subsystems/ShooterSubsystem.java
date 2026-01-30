@@ -25,6 +25,7 @@ public class ShooterSubsystem {
 
 
     private final DcMotor intake;
+    //private final DcMotor intake2;
     private final Servo intakeBlockServo;
     private final DcMotorEx outtakeMotor;
 
@@ -69,6 +70,7 @@ public class ShooterSubsystem {
     public ShooterSubsystem(HardwareMap hardwareMap) {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
         intake = hardwareMap.get(DcMotor.class, "intake");
+        //intake2 = hardwareMap.get(DcMotor.class, "intake2");
         intakeBlockServo = hardwareMap.get(Servo.class, "intakeBlockServo");
         leftVerticalServo = hardwareMap.get(Servo.class, "leftVerticalServo");
 
@@ -79,8 +81,8 @@ public class ShooterSubsystem {
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         // Set motor directions (adjust if movement is inverted) ----------
-        outtakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        intake.setDirection(DcMotor.Direction.FORWARD);
+        outtakeMotor.setDirection(DcMotorEx.Direction.FORWARD); //TODO: Check if inverted
+        intake.setDirection(DcMotor.Direction.FORWARD); //TODO: Check if inverted
         intakeBlockServo.setDirection(Servo.Direction.REVERSE);
         leftVerticalServo.setDirection(Servo.Direction.REVERSE);
 
@@ -210,6 +212,7 @@ public class ShooterSubsystem {
     }
 
 
+    //TODO: This will probably be removed
     // --- Manual Angling ---
     public void manualAngling(double leftStickY) {
 
@@ -255,7 +258,7 @@ public class ShooterSubsystem {
 
 
 
-
+    // Intake
     public void startIntake(double power) {
         intake.setPower(power);
     }
@@ -266,13 +269,30 @@ public class ShooterSubsystem {
         intake.setPower(0);
     }
 
-    public void startOuttake(double power) {
-        outtakeMotor.setPower(power);
-    }
-
+    // Outtake
+    public void startOuttake(double power) {outtakeMotor.setPower(power); }
     public void stopOuttake() {
         outtakeMotor.setPower(0);
     }
+
+    // Intake Balls (both)
+    public void startIntakeBalls(double power) {
+        intake.setPower(power);
+        //intake2.setPower(power);
+        outtakeMotor.setPower(power * 0.75);
+    }
+    public void reverseIntakeBalls(double power) {
+        intake.setPower(-power);
+        //intake2.setPower(-power);
+        outtakeMotor.setPower(-power * 0.5);
+    }
+    public void stopIntakeBalls() {
+        intake.setPower(0);
+        //intake2.setPower(0);
+        outtakeMotor.setPower(0);
+    }
+
+
 
     // --- Getters ---
     public double getOuttakeVelocity() {

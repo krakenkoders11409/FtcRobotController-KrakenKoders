@@ -92,7 +92,7 @@ public class mainTele extends LinearOpMode {
             }
             XPressedLast = gamepad2.x;
 
-            robot.shooter.manualAngling(gamepad2.left_stick_y);
+            robot.shooter.manualAngling(gamepad2.left_stick_y); //TODO: Might get rid of this
 
             // --- Auto Shot Type ---
             if(robot.vision.getTagDistanceMeters() < 2.5 || !robot.vision.hasTarget()){
@@ -115,30 +115,45 @@ public class mainTele extends LinearOpMode {
             }
 
             // Manually control the intakes -----------------------------------------------
-            // --- Intake ---
-            if (!robot.shooter.isBusy()) {
-                // Control the first intake
-                if (gamepad2.left_bumper)  {
-                    robot.shooter.startIntake(1);
-                } else if (gamepad2.right_bumper ) {
-                    robot.shooter.reverseIntake(0.5);
-                //} else if (gamepad2.left_trigger > 0.3) {
-//                    robot.shooter.unBlockIntake();
-//                    robot.shooter.startIntake(1);
-                } else {
-                    robot.shooter.stopIntake();
+            if (!robot.shooter.isBusy()){
+                if (gamepad2.left_trigger > 0.1) {
+                    robot.shooter.startIntakeBalls(gamepad2.left_trigger); // Whole intake
                 }
-
-                // Control Outtake ----------------------------------------------
-                if (gamepad2.right_trigger > 0) {
-                    //telemetry.addLine("Velocity= " + launcher.getVelocity());
-                    robot.shooter.startOuttake(1);
-                } else if (gamepad2.left_trigger > 0.3) {
-                    robot.shooter.startOuttake(-gamepad2.left_trigger);
-                } else {
-                    robot.shooter.stopOuttake();
+                if (gamepad2.right_trigger > 0.2) {
+                    robot.shooter.startOuttake(1); // Shoot
+                }
+                if (gamepad2.left_bumper) {
+                    robot.shooter.reverseIntake(1); // reverse Intake start
+                }
+                if (gamepad2.right_bumper) {
+                    robot.shooter.reverseIntakeBalls(1); // Reverse whole intake
                 }
             }
+
+//            // --- Intake ---
+//            if (!robot.shooter.isBusy()) {
+//                // Control the first intake
+//                if (gamepad2.left_bumper)  {
+//                    robot.shooter.startIntake(1);
+//                } else if (gamepad2.right_bumper ) {
+//                    robot.shooter.reverseIntake(0.5);
+//                //} else if (gamepad2.left_trigger > 0.3) {
+////                    robot.shooter.unBlockIntake();
+////                    robot.shooter.startIntake(1);
+//                } else {
+//                    robot.shooter.stopIntake();
+//                }
+//
+//                // Control Outtake ----------------------------------------------
+//                if (gamepad2.right_trigger > 0) {
+//                    //telemetry.addLine("Velocity= " + launcher.getVelocity());
+//                    robot.shooter.startOuttake(1);
+//                } else if (gamepad2.left_trigger > 0.3) {
+//                    robot.shooter.startOuttake(-gamepad2.left_trigger);
+//                } else {
+//                    robot.shooter.stopOuttake();
+//                }
+//            }
 
             robot.drive.driveFieldOriented(forward, strafe, turn);
 
