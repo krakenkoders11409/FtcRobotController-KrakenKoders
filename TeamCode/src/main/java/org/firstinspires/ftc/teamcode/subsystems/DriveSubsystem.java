@@ -14,8 +14,8 @@ public class DriveSubsystem {
 
 
     // Odometry Wheels Setup
-    private final DcMotor odoForwardWheel;
-    private final DcMotor odoStrafeWheel;
+//    private final DcMotor odoForwardWheel;
+//    private final DcMotor odoStrafeWheel;
 
     // IMU
     private IMU imu;
@@ -44,8 +44,6 @@ public class DriveSubsystem {
         frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
         backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
         backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
-        odoForwardWheel = hardwareMap.get(DcMotor.class, "odoForwardWheel");
-        odoStrafeWheel = hardwareMap.get(DcMotor.class, "odoStrafeWheel");
 
         // Set motor directions (adjust if movement is inverted) ----------
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -65,12 +63,6 @@ public class DriveSubsystem {
         backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        odoForwardWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odoStrafeWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        odoForwardWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        odoStrafeWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(
                 new RevHubOrientationOnRobot(
@@ -81,34 +73,50 @@ public class DriveSubsystem {
     }
 
 
-    public void updateOdometry() {
-        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        int forwardTicks = odoForwardWheel.getCurrentPosition();
-        int strafeTicks = odoStrafeWheel.getCurrentPosition();
+//    public void updateOdometry() {
+//        // Get robot heading from IMU
+//        heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//
+//        // Read wheel encoders
+////        int forwardTicks = forwardOdo.getTicks();
+////        int strafeTicks  = strafeOdo.getTicks();
+//
+//
+//        // Delta ticks since last update
+//        int deltaForwardTicks = forwardTicks - lastForwardEncoder;
+//        int deltaStrafeTicks  = strafeTicks - lastStrafeEncoder;
+//
+//        lastForwardEncoder = forwardTicks;
+//        lastStrafeEncoder  = strafeTicks;
+//
+//        // Convert to inches
+//        double deltaForwardInches = deltaForwardTicks / ODO_TICKS_PER_INCH;
+//        double deltaStrafeInches  = deltaStrafeTicks / ODO_TICKS_PER_INCH;
+//
+//        // Rotate local movement into field coordinates
+//        double deltaX = deltaStrafeInches * Math.cos(heading) - deltaForwardInches * Math.sin(heading);
+//        double deltaY = deltaStrafeInches * Math.sin(heading) + deltaForwardInches * Math.cos(heading);
+//
+//        // Update global field position
+//        xPos += deltaX;
+//        yPos += deltaY;
+//    }
 
-        int deltaForwardTicks = forwardTicks - lastForwardEncoder;
-        int deltaStrafeTicks = strafeTicks - lastStrafeEncoder;
-
-        lastForwardEncoder = forwardTicks;
-        lastStrafeEncoder = strafeTicks;
-
-        double deltaForwardInches = deltaForwardTicks / ODO_TICKS_PER_INCH;
-        double deltaStrafeInches = deltaStrafeTicks / ODO_TICKS_PER_INCH;
-
-        double fieldDeltaX = deltaStrafeInches * Math.cos(heading) - deltaForwardInches * Math.sin(heading);
-        double fieldDeltaY = deltaStrafeInches * Math.sin(heading) - deltaForwardInches * Math.cos(heading);
-
-        xPos += fieldDeltaX;
-        yPos += fieldDeltaY;
-    }
 
 
     // Field Oriented Drive -----------------------------------------------------------------------
-    public void driveFieldOriented(double forward, double strafe, double turn){
-        double rotStrafe = strafe * Math.cos(heading) - forward * Math.sin(heading);
-        double rotForward = strafe * Math.sin(heading) + forward * Math.cos(heading);
+    // Call this every loop
+    public void driveFieldOriented(double forward, double strafe, double turn) {
+        // Update heading from odometry
+//        updateOdometry(); // ensures heading is current
 
-        drive(rotForward, rotStrafe, turn);
+        double cosH = Math.cos(-heading); // negative because we rotate joystick opposite
+        double sinH = Math.sin(-heading);
+
+        double fieldForward = forward * cosH - strafe * sinH;
+        double fieldStrafe  = forward * sinH + strafe * cosH;
+
+        drive(fieldForward, fieldStrafe, turn);
     }
 
 
@@ -117,7 +125,8 @@ public class DriveSubsystem {
 
 
 
-// Normal Drive ---------------------------------------------------------------------------------
+
+    // Normal Drive ---------------------------------------------------------------------------------
     public void drive(double forward, double strafe, double turn) {
 
         strafe *= 1.1; // minor correction for imperfect strafing
@@ -170,7 +179,7 @@ public class DriveSubsystem {
     }
 
     public void update() {
-        // Add odometry later if needed
+//        updateOdometry();
     }
 
 //     ------------------------ AUTONOMOUS HELPERS ---------------------------------------------------

@@ -55,8 +55,8 @@ public class Robot {
     public void update() {
         // --- Update Subsystems
         drive.update();
-//        shooter.update();
-//        vision.update();
+        shooter.update();
+        vision.update();
 
         // Read Vision output
         double headingDeg = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
