@@ -63,6 +63,10 @@ public class TurretSubsystem {
 
     public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         turntableMotor = hardwareMap.get(DcMotor.class, "turntableMotor");
+        if (turntableMotor == null) {
+            throw new IllegalStateException("turntableMotor not found in hardware map!");
+        }
+
 
         // Set Encoder Logic -------------------------------------------------
         turntableMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

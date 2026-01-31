@@ -36,8 +36,8 @@ public class mainTele extends LinearOpMode {
         telemetry.addLine("Ready to drive!");
 
         robot = new Robot(hardwareMap, telemetry);
-        robot.shooter.angleUp();
-        robot.shooter.angleDown();
+//        robot.shooter.angleUp();
+//        robot.shooter.angleDown();
 
 
         waitForStart();
@@ -92,7 +92,7 @@ public class mainTele extends LinearOpMode {
             }
             XPressedLast = gamepad2.x;
 
-            robot.shooter.manualAngling(gamepad2.left_stick_y);
+//            robot.shooter.manualAngling(gamepad2.left_stick_y);
 
             // --- Auto Shot Type ---
             if(robot.vision.getTagDistanceMeters() < 2.5 || !robot.vision.hasTarget()){
@@ -139,8 +139,15 @@ public class mainTele extends LinearOpMode {
                     robot.shooter.stopOuttake();
                 }
             }
+            // Intake block
+            if (gamepad2.dpad_up && !DPadUpPressedLast) {
+                robot.shooter.unBlockIntake();
+            } else {
+                robot.shooter.blockIntake();
+            }
 
-            robot.drive.driveFieldOriented(forward, strafe, turn);
+
+            robot.drive.drive(forward, strafe, turn);
 
             // Loop updates
             robot.update();

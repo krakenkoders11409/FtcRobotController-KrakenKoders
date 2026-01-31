@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -24,11 +23,9 @@ public class ShooterSubsystem {
 
 
 
-    private final DcMotor intake;
+    private final DcMotor frontIntakeMotor;
     private final Servo intakeBlockServo;
     private final DcMotorEx outtakeMotor;
-
-    private final Servo leftVerticalServo;
 
     // Tunables
     private final int shortShotVelocity = 950; // spin power
@@ -68,9 +65,9 @@ public class ShooterSubsystem {
 
     public ShooterSubsystem(HardwareMap hardwareMap) {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
-        intake = hardwareMap.get(DcMotor.class, "intake");
+        frontIntakeMotor = hardwareMap.get(DcMotor.class, "frontIntakeMotor");
         intakeBlockServo = hardwareMap.get(Servo.class, "intakeBlockServo");
-        leftVerticalServo = hardwareMap.get(Servo.class, "leftVerticalServo");
+
 
 
 
@@ -80,9 +77,9 @@ public class ShooterSubsystem {
 
         // Set motor directions (adjust if movement is inverted) ----------
         outtakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
-        intake.setDirection(DcMotor.Direction.FORWARD);
+        frontIntakeMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeBlockServo.setDirection(Servo.Direction.REVERSE);
-        leftVerticalServo.setDirection(Servo.Direction.REVERSE);
+
 
 
 
@@ -134,7 +131,7 @@ public class ShooterSubsystem {
                         state = State.FEED;
                         timer.reset();
                         unBlockIntake();
-                        intake.setPower(intakePower); // push ball into shooter
+                        frontIntakeMotor.setPower(intakePower); // push ball into shooter
                     }
                 } else {
                     if (Math.abs(longShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
@@ -142,7 +139,7 @@ public class ShooterSubsystem {
                         state = State.FEED;
                         timer.reset();
                         blockIntake();
-                        intake.setPower(intakePower); // push ball into shooter
+                        frontIntakeMotor.setPower(intakePower); // push ball into shooter
 
                     }
                 }
@@ -155,7 +152,7 @@ public class ShooterSubsystem {
                     // if (timer.milliseconds() >= spinUpMs) {
                     state = State.FEED;
                     timer.reset();
-                    intake.setPower(intakePower); // push ball into shooter
+                    frontIntakeMotor.setPower(intakePower); // push ball into shooter
 
                 }
                 break;
@@ -165,7 +162,7 @@ public class ShooterSubsystem {
                     state = State.SPIN_DOWN;
                     timer.reset();
                     outtakeMotor.setVelocity(0);
-                    intake.setPower(0);
+                    frontIntakeMotor.setPower(0);
                 }
                 break;
 
@@ -225,28 +222,28 @@ public class ShooterSubsystem {
         // Clamp to limits
         anglePos = Math.max(ANGLE_MIN, Math.min(ANGLE_MAX, anglePos));
 
-        leftVerticalServo.setPosition(anglePos);
+
     }
     public void hoodAngle(double position) {
-        leftVerticalServo.setPosition(position);
+
     }
 
 
     public void angleUp() {
         anglePos += ANGLE_STEP;
         anglePos = Math.min(anglePos, ANGLE_MAX);
-        leftVerticalServo.setPosition(anglePos);
+
     }
 
     public void angleDown() {
         anglePos -= ANGLE_STEP;
         anglePos = Math.max(anglePos, ANGLE_MIN);
-        leftVerticalServo.setPosition(anglePos);
+
     }
 
     public void setAngle(double position) {
         anglePos = Math.max(ANGLE_MIN, Math.min(ANGLE_MAX, position));
-        leftVerticalServo.setPosition(anglePos);
+
     }
 
     public double getAngle() {
@@ -257,13 +254,13 @@ public class ShooterSubsystem {
 
 
     public void startIntake(double power) {
-        intake.setPower(power);
+        frontIntakeMotor.setPower(power);
     }
     public void reverseIntake(double power) {
-        intake.setPower(-power);
+        frontIntakeMotor.setPower(-power);
     }
     public void stopIntake() {
-        intake.setPower(0);
+        frontIntakeMotor.setPower(0);
     }
 
     public void startOuttake(double power) {
