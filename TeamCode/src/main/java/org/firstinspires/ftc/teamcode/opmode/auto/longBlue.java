@@ -36,6 +36,7 @@ public class longBlue extends LinearOpMode {
         // Set turret TX offset to +10 degrees <- Left (adjust if your sign convention differs)
         robot.turret.setTxOffset(2);
         robot.turret.setTurretKP(0.03);
+        final double AIM_TOLERANCE_DEG = 5.0;  // aim tolerance in degrees
 
         // Prefer explicit enable if available. If not, toggle is a fallback.
         try {
@@ -49,6 +50,7 @@ public class longBlue extends LinearOpMode {
         robot.vision.clearAllowedTags();
         robot.vision.addAllowedTag(20);
 
+
         // Timer for sequential actions and timeouts
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
@@ -58,7 +60,6 @@ public class longBlue extends LinearOpMode {
 
         // safety timeout values (adjust as needed)
         final double SHOOT_TIMEOUT_S = 4;    // max seconds to wait for shooter
-        final double AIM_TOLERANCE_DEG = 5.0;  // aim tolerance in degrees
         boolean rotate = false;
 
         while (opModeIsActive() && autoStep != AutoStep.DONE) {

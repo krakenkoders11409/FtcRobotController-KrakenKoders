@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 public class TurretSubsystem {
+    Robot robot;
     // Setup for Turret Motor  ------------------------------------------------------------
     private final double turretMax = 0.85;
     private final double turretMin = 0.15;
@@ -188,6 +188,29 @@ public class TurretSubsystem {
         busy = true;
 
     }
+
+    public void initAim(double xOffset, int targetTagID) {
+
+        // Set turret TX offset to +10 degrees <- Left (adjust if your sign convention differs)
+        setTxOffset(xOffset);
+        setTurretKP(0.03);
+        final double AIM_TOLERANCE_DEG = 5.0;  // aim tolerance in degrees
+
+        // Prefer explicit enable if available. If not, toggle is a fallback.
+        try {
+            // if API has enableAutoAim(boolean)
+            getClass().getMethod("enableAutoAim", boolean.class).invoke(true);
+        } catch (Exception e) {
+            // fallback to toggle if explicit method not present
+            toggleAutoAim();
+        }
+
+        robot.vision.clearAllowedTags();
+        robot.vision.addAllowedTag(targetTagID);
+
+    }
+
+
     public void update(double horizontalInput, double tx, boolean hasTarget) {
 
         // 1. Manual ALWAYS wins
