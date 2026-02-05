@@ -26,6 +26,9 @@ public class mainTele extends LinearOpMode {
     boolean DPadUpPressedLast = false;
     boolean DPadDownPressedLast = false;
 
+    // Gamepad 1 button tracking for field-oriented toggle
+    boolean GP1_YPressedLast = false;
+
     private String shotType = "";
 
 
@@ -39,6 +42,9 @@ public class mainTele extends LinearOpMode {
 //        robot.shooter.angleUp();
 //        robot.shooter.angleDown();
 
+        // Initialize Pedro Pathing Follower for field-oriented driving
+        robot.initFollowerForTeleop(hardwareMap);
+        robot.drive.setFieldOrientedEnabled(true);  // Start in field-oriented mode
 
         waitForStart();
 
@@ -56,6 +62,23 @@ public class mainTele extends LinearOpMode {
             if (gamepad1.b && !BPressedLast) {
                 robot.drive.toggleSlowMode();
             }
+            BPressedLast = gamepad1.b;
+
+            // Field-Oriented Driving Controls -------------------------------------------
+            // Toggle field-oriented / robot-centric with Y button
+            if (gamepad1.y && !GP1_YPressedLast) {
+                robot.drive.toggleFieldOriented();
+            }
+            GP1_YPressedLast = gamepad1.y;
+
+            // Reset heading with back button (current direction becomes "forward")
+            if (gamepad1.back) {
+                robot.resetHeading();
+            }
+
+            // Update Follower and heading each loop
+            robot.getFollower().update();
+            robot.drive.setHeading(robot.getHeadingRadians());
 
 
 
@@ -147,13 +170,15 @@ public class mainTele extends LinearOpMode {
             }
 
 
-            robot.drive.drive(forward, strafe, turn);
+            robot.drive.driveFieldOriented(forward, strafe, turn);
 
             // Loop updates
             robot.update();
 
             // Display info on driver station --------------------------------
             robot.addTelemetry(telemetry);
+            telemetry.addData("Drive Mode", robot.drive.isFieldOrientedEnabled() ? "FIELD" : "ROBOT");
+            telemetry.addData("Heading", Math.toDegrees(robot.getHeadingRadians()));
             telemetry.update();
 
         }

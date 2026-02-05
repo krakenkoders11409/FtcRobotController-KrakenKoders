@@ -15,6 +15,9 @@ public class DriveSubsystem {
     private double speedMultiplier = 1.0;
     private static final double TICKS_PER_DEGREE = 7.75;
 
+    // Field-oriented driving state
+    private double headingRadians = 0.0;
+    private boolean fieldOrientedEnabled = false;
 
     double lastLfPower = 0;
     double lastLbPower = 0;
@@ -71,6 +74,41 @@ public class DriveSubsystem {
 
     public void toggleSlowMode() {
         speedMultiplier = (speedMultiplier == 1.0) ? 0.5 : 1.0;
+    }
+
+    // --- Field-Oriented Driving Methods ---
+
+    public void setHeading(double headingRadians) {
+        this.headingRadians = headingRadians;
+    }
+
+    public void setFieldOrientedEnabled(boolean enabled) {
+        this.fieldOrientedEnabled = enabled;
+    }
+
+    public void toggleFieldOriented() {
+        this.fieldOrientedEnabled = !this.fieldOrientedEnabled;
+    }
+
+    public boolean isFieldOrientedEnabled() {
+        return fieldOrientedEnabled;
+    }
+
+    /**
+     * Drive with optional field-oriented control.
+     * When field-oriented is enabled, inputs are rotated by the robot's heading
+     * so "forward" always means toward the field's forward direction.
+     */
+    public void driveFieldOriented(double forward, double strafe, double turn) {
+        if (fieldOrientedEnabled) {
+            double cosH = Math.cos(-headingRadians);
+            double sinH = Math.sin(-headingRadians);
+            double rotatedForward = forward * cosH - strafe * sinH;
+            double rotatedStrafe = forward * sinH + strafe * cosH;
+            drive(rotatedForward, rotatedStrafe, turn);
+        } else {
+            drive(forward, strafe, turn);
+        }
     }
 
     public void stop() {
