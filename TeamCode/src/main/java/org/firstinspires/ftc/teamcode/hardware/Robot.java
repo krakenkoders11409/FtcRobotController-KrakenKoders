@@ -25,10 +25,10 @@ public class Robot {
         // Initialize all subsystems in a controlled, predictable order
 
         // --- Subsystems ---
-        turret = new TurretSubsystem(hardwareMap, telemetry);
+        vision = new VisionSubsystem(hardwareMap);
+        turret = new TurretSubsystem(hardwareMap, telemetry, vision);
         drive = new DriveSubsystem(hardwareMap);
         shooter = new ShooterSubsystem(hardwareMap);
-        vision = new VisionSubsystem(hardwareMap);
         imu = hardwareMap.get(IMU.class, "imu");
         //intake = new IntakeSubsystem(hardwareMap);
 

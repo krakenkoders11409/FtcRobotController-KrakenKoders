@@ -4,10 +4,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 public class TurretSubsystem {
-    Robot robot;
+    private VisionSubsystem vision;
     // Setup for Turret Motor  ------------------------------------------------------------
     private final double turretMax = 0.85;
     private final double turretMin = 0.15;
@@ -61,7 +60,8 @@ public class TurretSubsystem {
 
     private boolean busy = false;
 
-    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
+    public TurretSubsystem(HardwareMap hardwareMap, Telemetry telemetry, VisionSubsystem vision) {
+        this.vision = vision;
         turntableMotor = hardwareMap.get(DcMotor.class, "turntableMotor");
         if (turntableMotor == null) {
             throw new IllegalStateException("turntableMotor not found in hardware map!");
@@ -205,8 +205,8 @@ public class TurretSubsystem {
             toggleAutoAim();
         }
 
-        robot.vision.clearAllowedTags();
-        robot.vision.addAllowedTag(targetTagID);
+        vision.clearAllowedTags();
+        vision.addAllowedTag(targetTagID);
 
     }
 

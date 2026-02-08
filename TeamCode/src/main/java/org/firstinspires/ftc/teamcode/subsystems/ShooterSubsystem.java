@@ -23,7 +23,7 @@ public class ShooterSubsystem {
 
 
 
-    private final DcMotor frontIntakeMotor;
+    private final DcMotor frontIntakeMotor, backIntakeMotor;
     private final Servo intakeBlockServo;
     private final DcMotorEx outtakeMotor;
 
@@ -66,6 +66,7 @@ public class ShooterSubsystem {
     public ShooterSubsystem(HardwareMap hardwareMap) {
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
         frontIntakeMotor = hardwareMap.get(DcMotor.class, "frontIntakeMotor");
+        backIntakeMotor = hardwareMap.get(DcMotor.class, "backIntakeMotor");
         intakeBlockServo = hardwareMap.get(Servo.class, "intakeBlockServo");
 
 
@@ -154,6 +155,7 @@ public class ShooterSubsystem {
                     timer.reset();
                     frontIntakeMotor.setPower(intakePower); // push ball into shooter
 
+
                 }
                 break;
 
@@ -163,6 +165,7 @@ public class ShooterSubsystem {
                     timer.reset();
                     outtakeMotor.setVelocity(0);
                     frontIntakeMotor.setPower(0);
+                    backIntakeMotor.setPower(0);
                 }
                 break;
 

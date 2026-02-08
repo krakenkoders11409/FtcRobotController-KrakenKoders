@@ -53,7 +53,7 @@ public class PedroBlueShort extends OpMode {
                 .setLinearHeadingInterpolation(startPose.getHeading(), shootPose.getHeading())
                 .build();
         driveShootPosPickupPos = follower.pathBuilder()
-                .addPath(new BezierCurve(shootPose, pickupPose))
+                .addPath(new BezierLine(shootPose, pickupPose))
                 .setLinearHeadingInterpolation(shootPose.getHeading(), pickupPose.getHeading())
                 .build();
         drivePickupPosShootPos = follower.pathBuilder()
