@@ -119,6 +119,7 @@ public class mainTele extends LinearOpMode {
             if (!robot.shooter.isBusy()) {
                 // Control the first intake
                 if (gamepad1.left_bumper)  {
+                    robot.shooter.blockIntake();
                     robot.shooter.startIntake(1);
                 } else if (gamepad1.right_bumper ) {
                     robot.shooter.reverseIntake(0.5);
@@ -140,18 +141,8 @@ public class mainTele extends LinearOpMode {
                 }
             }
             // Intake block
-//            if (gamepad2.b && !BPressedLast) {
-//                robot.shooter.unBlockIntake();
-//            } else {
-//                robot.shooter.blockIntake();
-//            }
-            if(gamepad2.b){
+            if (gamepad2.b && !BPressedLast) {
                 robot.shooter.unBlockIntake();
-                telemetry.addLine("Intake Unblocked");
-            }
-            else {
-                robot.shooter.blockIntake();
-                telemetry.addLine("Intake Blocked");
             }
 
 

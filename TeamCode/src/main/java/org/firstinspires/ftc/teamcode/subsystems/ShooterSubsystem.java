@@ -29,16 +29,16 @@ public class ShooterSubsystem {
     private final DcMotorEx outtakeMotor;
 
     // Tunables
-    private final int shortShotVelocity = 950; // spin power
-    private final int longShotVelocity = 1250; // spin power
+    private final int shortShotVelocity = 2500; // spin power
+    private final int longShotVelocity = 3000; // spin power TODO: FIND WHAT WE NEED HERE
     private final int AutoShortShotVelocity = 960; // spin power
     private final int AutoLongShotVelocity = 1000; // spin power
 
     private final int ejectVelocity = 500;
     private final double targetPower = 1.0; // spin power
     private final double intakePower = 1.0; // spin power
-    private final long spinUpMs = 2000; // wait time before feed
-    private final long feedMs = 2000; // time to press the ball
+    private final long spinUpMs = 3000; // wait time before feed
+    private final long feedMs = 2500; // time to press the ball
     private final long spinDownMs = 1000; // optional coast-down window
     private final int velocityTolerance = 35; // how far away from the target velocity is OK
     private String shotType = "";
@@ -104,6 +104,7 @@ public class ShooterSubsystem {
         busy = true;
         state = State.SPIN_UP;
         timer.reset();
+//        intakeBlockServo.setPosition(intakeUnblocked);
 
         //launcher.setPower(targetPower);
         if (Objects.equals(shotType, "short")) {
@@ -129,20 +130,34 @@ public class ShooterSubsystem {
             case SPIN_UP:
                 lastVelocity = outtakeMotor.getVelocity();
                 if ("short".equals(shotType)) {
-                    if (Math.abs(shortShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
-                        //if (timer.milliseconds() >= spinUpMs) {
-                        state = State.FEED;
-                        timer.reset();
-                        unBlockIntake();
-                        frontIntakeMotor.setPower(intakePower); // push ball into shooter
-                    }
+                        if (Math.abs(shortShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance
+                                || timer.milliseconds() >= spinUpMs) {
+                            state = State.FEED;
+                            timer.reset();
+                            intakeBlockServo.setPosition(intakeUnblocked);
+                            timer.reset();
+                            if (timer.milliseconds() > 100) {
+                                frontIntakeMotor.setPower(intakePower);
+                                backIntakeMotor.setPower(intakePower);
+                            }
+                            frontIntakeMotor.setPower(intakePower);
+                            backIntakeMotor.setPower(intakePower);
+                        }
+
                 } else {
                     if (Math.abs(longShotVelocity - outtakeMotor.getVelocity()) < velocityTolerance) {
                         //if (timer.milliseconds() >= spinUpMs) {
                         state = State.FEED;
                         timer.reset();
-                        blockIntake();
+                        timer.reset();
+                        intakeBlockServo.setPosition(intakeUnblocked);
+                        timer.reset();
+                        if (timer.milliseconds() > 100) {
+                            frontIntakeMotor.setPower(intakePower);
+                            backIntakeMotor.setPower(intakePower);
+                        }
                         frontIntakeMotor.setPower(intakePower); // push ball into shooter
+                        backIntakeMotor.setPower(intakePower); // push ball into shooter
 
                     }
                 }
@@ -204,11 +219,13 @@ public class ShooterSubsystem {
         // launcher.setPower(targetPower);
         outtakeMotor.setVelocity(ejectVelocity);
     }
+    private double intakeBlocked = 0.8;
+    private double intakeUnblocked = 0.95;
     public void blockIntake() {
-        intakeBlockServo.setPosition(.84);
+        intakeBlockServo.setPosition(intakeBlocked);
     }
     public void unBlockIntake() {
-        intakeBlockServo.setPosition(.9);
+        intakeBlockServo.setPosition(intakeUnblocked);
     }
 
 
