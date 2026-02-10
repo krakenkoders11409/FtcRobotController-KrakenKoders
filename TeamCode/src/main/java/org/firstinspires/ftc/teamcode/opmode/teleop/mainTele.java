@@ -53,9 +53,9 @@ public class mainTele extends LinearOpMode {
             double vertical = -gamepad2.left_stick_y;
 
             // Change Speed --------------------------------------------------------------
-            if (gamepad1.b && !BPressedLast) {
-                robot.drive.toggleSlowMode();
-            }
+//            if (gamepad1.b && !BPressedLast) {
+//                robot.drive.toggleSlowMode();
+//            }
 
 
 
@@ -118,9 +118,9 @@ public class mainTele extends LinearOpMode {
             // --- Intake ---
             if (!robot.shooter.isBusy()) {
                 // Control the first intake
-                if (gamepad2.left_bumper)  {
+                if (gamepad1.left_bumper)  {
                     robot.shooter.startIntake(1);
-                } else if (gamepad2.right_bumper ) {
+                } else if (gamepad1.right_bumper ) {
                     robot.shooter.reverseIntake(0.5);
                 //} else if (gamepad2.left_trigger > 0.3) {
 //                    robot.shooter.unBlockIntake();

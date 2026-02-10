@@ -20,7 +20,7 @@ public class TurretSubsystem {
     double turnPower = 0;
 
     // Limelight aiming constants --------------------------------------------------------
-    private static double TURRET_KP = 0.015; // tune on field (orig 0.015)
+    private static double TURRET_KP = 0.01; // tune on field (orig 0.015)
 
     public void setTurretKP(double kp) {
         TURRET_KP = kp;
@@ -294,7 +294,7 @@ public class TurretSubsystem {
             return;
         }
 
-        double power = tx * (TURRET_KP * -1);
+        double power = tx * (TURRET_KP * 1);
         // clamp
         power = Math.max(-MAX_AUTO_POWER, Math.min(MAX_AUTO_POWER, power));
 

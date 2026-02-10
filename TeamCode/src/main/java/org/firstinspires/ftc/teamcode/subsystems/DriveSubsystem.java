@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.constants.DriveConstants.DriveConst
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -32,7 +33,7 @@ public class DriveSubsystem {
         frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        frontRightMotor.setDirection(DcMotor.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.FORWARD);
 
 
@@ -76,9 +77,9 @@ public class DriveSubsystem {
 //        backRightMotor.setPower(0.5); // correct
     }
 
-    public void toggleSlowMode() {
-        speedMultiplier = (speedMultiplier == 1.0) ? 0.5 : 1.0;
-    }
+//    public void toggleSlowMode() {
+//        speedMultiplier = (speedMultiplier == 1.0) ? 0.5 : 1.0;
+//    }
 
     public void stop() {
         frontLeftMotor.setPower(0);

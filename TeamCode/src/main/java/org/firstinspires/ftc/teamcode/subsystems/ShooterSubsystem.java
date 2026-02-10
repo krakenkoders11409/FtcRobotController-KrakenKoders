@@ -205,7 +205,7 @@ public class ShooterSubsystem {
         outtakeMotor.setVelocity(ejectVelocity);
     }
     public void blockIntake() {
-        intakeBlockServo.setPosition(.8);
+        intakeBlockServo.setPosition(.84);
     }
     public void unBlockIntake() {
         intakeBlockServo.setPosition(.9);
