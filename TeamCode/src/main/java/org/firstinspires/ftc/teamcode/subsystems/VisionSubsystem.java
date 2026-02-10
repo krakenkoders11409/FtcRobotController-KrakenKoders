@@ -29,6 +29,12 @@ public class VisionSubsystem {
     private double tagDistanceMeters = -1.0;
     private double tagForwardMeters = -1.0;   // absolute Z component if useful
 
+    // Target Tags for Anchoring
+    private int primaryTargetTag = -1;
+    private int activeTargetTag = -1;
+    private int visibleTagCount = 0;
+
+
     // fiducial count for telemetry/debugging
     private int fiducialCount = 0;
 
@@ -143,6 +149,41 @@ public class VisionSubsystem {
         allowedTags.clear();
     }
 
+    // Primary target ---
+
+    public void setPrimaryTargetTag(int tagId) {
+        primaryTargetTag = tagId;
+    }
+
+
+    // -----------
+    // Getters
+    // ----------
+
+    public int getPrimaryTargetTag() {
+        return primaryTargetTag;
+    }
+
+    public int getActiveTargetTag() {
+        return activeTargetTag;
+    }
+
+    public int getVisibleTagCount() {
+        return visibleTagCount;
+    }
+
+    // Vision Confidence
+    public double getPoseConfidenceScale() {
+        if (!hasFieldPose) return 0.0;
+
+        if (visibleTagCount >= 2) return 1.0;
+        if (visibleTagCount == 1) return 0.5;
+        return 0.0;
+    }
+
+
+
+
 
 
     public void update() {
@@ -161,20 +202,31 @@ public class VisionSubsystem {
         // Fiducials
         fiducialCount = result.getFiducialResults() != null ? result.getFiducialResults().size() : 0;
 
-        // --- Select first allowed tag ---
+        // --- Select target tag independently of pose ---
         LLResultTypes.FiducialResult selectedTag = null;
+
         if (result.getFiducialResults() != null) {
             for (LLResultTypes.FiducialResult fid : result.getFiducialResults()) {
-                // Empty whitelist = allow all tags
-                if (allowedTags.isEmpty() || allowedTags.contains(fid.getFiducialId())) {
+
+                // 1. Primary target tag ALWAYS wins
+                if (fid.getFiducialId() == primaryTargetTag) {
                     selectedTag = fid;
-                    break; // stop at first allowed tag
+                    break;
+                }
+
+                // 2. Otherwise fall back to any allowed anchor tag
+                if (selectedTag == null &&
+                        (allowedTags.isEmpty() || allowedTags.contains(fid.getFiducialId()))) {
+                    selectedTag = fid;
                 }
             }
         }
 
+
         if (selectedTag != null) {
             hasTarget = true;
+
+            activeTargetTag = selectedTag.getFiducialId();
 
             Pose3D camToTag = selectedTag.getCameraPoseTargetSpace();
             if (camToTag != null) {
@@ -196,6 +248,7 @@ public class VisionSubsystem {
         } else {
             // No allowed tag detected
             hasTarget = false;
+            activeTargetTag = -1;
             tagDistanceMeters = -1.0;
             tagForwardMeters = -1.0;
             tx = 0;
@@ -240,6 +293,12 @@ public class VisionSubsystem {
         telemetry.addData("Has Distance", hasTagDistance());
 
         telemetry.addData("Fiducial Count", fiducialCount);
+
+        telemetry.addData("Primary Target Tag", primaryTargetTag);
+        telemetry.addData("Active Target Tag", activeTargetTag);
+        telemetry.addData("Visible Tags", visibleTagCount);
+        telemetry.addData("Multi-Tag Pose", visibleTagCount >= 2);
+
 
         if (tagDistanceMeters > 0) {
             telemetry.addData("Tag Dist (m) Euclidean", "%.3f", tagDistanceMeters);

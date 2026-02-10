@@ -100,9 +100,9 @@ public class mainTele extends LinearOpMode {
             } else {
                 shotType = "long";
             }
-            if (gamepad2.b) {
-                robot.shooter.startShot(1, shotType);
-            }
+//            if (gamepad2.b) {
+//                robot.shooter.startShot(1, shotType);
+//            }
 
             // --- Initiate a short shot ---
             if (gamepad2.y && !YPressedLast) {
@@ -140,10 +140,18 @@ public class mainTele extends LinearOpMode {
                 }
             }
             // Intake block
-            if (gamepad2.dpad_up && !DPadUpPressedLast) {
+//            if (gamepad2.b && !BPressedLast) {
+//                robot.shooter.unBlockIntake();
+//            } else {
+//                robot.shooter.blockIntake();
+//            }
+            if(gamepad2.b){
                 robot.shooter.unBlockIntake();
-            } else {
+                telemetry.addLine("Intake Unblocked");
+            }
+            else {
                 robot.shooter.blockIntake();
+                telemetry.addLine("Intake Blocked");
             }
 
 

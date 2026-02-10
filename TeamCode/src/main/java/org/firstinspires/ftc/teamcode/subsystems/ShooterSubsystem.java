@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -77,8 +78,9 @@ public class ShooterSubsystem {
         outtakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         // Set motor directions (adjust if movement is inverted) ----------
-        outtakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        outtakeMotor.setDirection(DcMotorEx.Direction.REVERSE);
         frontIntakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        backIntakeMotor.setDirection(DcMotor.Direction.REVERSE);
         intakeBlockServo.setDirection(Servo.Direction.REVERSE);
 
 
@@ -203,10 +205,10 @@ public class ShooterSubsystem {
         outtakeMotor.setVelocity(ejectVelocity);
     }
     public void blockIntake() {
-        intakeBlockServo.setPosition(-0.5);
+        intakeBlockServo.setPosition(.8);
     }
     public void unBlockIntake() {
-        intakeBlockServo.setPosition(0.5);
+        intakeBlockServo.setPosition(.9);
     }
 
 
@@ -258,12 +260,15 @@ public class ShooterSubsystem {
 
     public void startIntake(double power) {
         frontIntakeMotor.setPower(power);
+        backIntakeMotor.setPower(power);
     }
     public void reverseIntake(double power) {
         frontIntakeMotor.setPower(-power);
+        backIntakeMotor.setPower(-power);
     }
     public void stopIntake() {
         frontIntakeMotor.setPower(0);
+        backIntakeMotor.setPower(0);
     }
 
     public void startOuttake(double power) {
